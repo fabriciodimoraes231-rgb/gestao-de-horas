@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Controle de Horas — Envision P&D</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+
+  <!-- CDN: Chart.js v4 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <!-- CDN: Lucide Icons -->
+  <script src="https://unpkg.com/lucide@0.363.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════
+     TELA DE LOGIN
+     ════════════════════════════════════════════════ -->
+<div id="login-screen" class="login-screen">
+
+  <div class="login-brand">
+    <div class="login-logo">
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="52" height="52" rx="13" fill="white" fill-opacity="0.18"/>
+        <rect x="1" y="1" width="50" height="50" rx="12" stroke="white" stroke-opacity="0.3" stroke-width="1"/>
+        <text x="26" y="36" text-anchor="middle" fill="white" font-family="Inter, sans-serif" font-size="24" font-weight="700">E</text>
+      </svg>
+      <div>
+        <div class="login-logo-title">Envision</div>
+        <div class="login-logo-sub">Pesquisa &amp; Desenvolvimento</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="login-card">
+    <h1 class="login-title">Bem-vindo de volta</h1>
+    <p class="login-subtitle">Entre com sua conta corporativa para acessar o sistema de controle de horas</p>
+
+    <form onsubmit="handleLogin(event)" autocomplete="off">
+      <div class="form-group">
+        <label class="form-label">E-mail corporativo</label>
+        <input type="email" class="form-input" placeholder="nome@envision.com" value="manuel@envision.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Senha</label>
+        <input type="password" class="form-input" placeholder="••••••••" value="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full btn-lg" id="btn-login">
+        <i data-lucide="log-in"></i>
+        Entrar via Keycloak SSO
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <i data-lucide="shield-check"></i>
+      <span>Autenticação segura gerenciada pelo Keycloak</span>
+    </div>
+  </div>
+
+  <div class="login-demo-hint">
+    <i data-lucide="info"></i>
+    <span>Protótipo interativo — clique em "Entrar" e use as abas <strong>Admin · Gestor · Colaborador</strong> para explorar os perfis</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════
+     SHELL DO APLICATIVO
+     ════════════════════════════════════════════════ -->
+<div id="app-shell" class="app-shell hidden">
+
+  <!-- ── Sidebar ── -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <svg width="34" height="34" viewBox="0 0 52 52" fill="none">
+        <rect width="52" height="52" rx="12" fill="white" fill-opacity="0.12"/>
+        <text x="26" y="36" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="22" font-weight="700">E</text>
+      </svg>
+      <div>
+        <div class="sidebar-brand">Envision</div>
+        <div class="sidebar-subbrand">P&amp;D — RD2</div>
+      </div>
+    </div>
+
+    <nav id="sidebar-nav" class="sidebar-nav">
+      <!-- Populado por JS (buildSidebar) -->
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user" onclick="navigate('perfil')">
+        <div id="sidebar-avatar" class="avatar avatar-sm av-admin">MM</div>
+        <div class="sidebar-user-info">
+          <div id="sidebar-username" class="sidebar-user-name">Manuel Moraes</div>
+          <div id="sidebar-userrole" class="sidebar-user-role">Administrador</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Wrapper principal ── -->
+  <div class="main-wrapper">
+
+    <!-- ── Topbar ── -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="btn-icon" onclick="toggleSidebar()" title="Menu">
+          <i data-lucide="menu"></i>
+        </button>
+        <span id="breadcrumb" class="breadcrumb">Dashboard</span>
+      </div>
+
+      <div class="topbar-right">
+        <!-- Seletor de perfil (apenas demonstração) -->
+        <div class="profile-switcher" title="Trocar perfil de demonstração">
+          <span style="font-size:11px;color:var(--text-muted);font-weight:600;">Demo:</span>
+          <div class="profile-tabs">
+            <button class="profile-tab active" data-profile="admin"       onclick="switchProfile('admin')">Admin</button>
+            <button class="profile-tab"         data-profile="gestor"      onclick="switchProfile('gestor')">Gestor</button>
+            <button class="profile-tab"         data-profile="colaborador" onclick="switchProfile('colaborador')">Colaborador</button>
+          </div>
+        </div>
+
+        <button class="btn-icon" title="Notificações" style="position:relative;">
+          <i data-lucide="bell"></i>
+          <span class="notification-dot"></span>
+        </button>
+
+        <div class="topbar-user" onclick="navigate('perfil')">
+          <div id="topbar-avatar" class="avatar avatar-sm av-admin">MM</div>
+          <span id="topbar-name">Manuel Moraes</span>
+          <i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-muted);"></i>
+        </div>
+
+        <button class="btn-icon btn-danger-hover" onclick="handleLogout()" title="Sair do sistema">
+          <i data-lucide="log-out"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- ── Conteúdo principal ── -->
+    <main id="content" class="content">
+      <!-- Renderizado dinamicamente por navigate() em app.js -->
+    </main>
+
+    <!-- ── Rodapé ── -->
+    <footer class="footer">
+      <span>© 2026 Envision P&amp;D — Sistema de Controle de Horas <strong>v1.1.0</strong></span>
+      <span style="margin: 0 var(--space-md); color: var(--border);">|</span>
+      <span style="color: var(--accent);">● Online</span>
+      <span style="margin: 0 var(--space-md); color: var(--border);">|</span>
+      <span>Keycloak SSO ativo</span>
+    </footer>
+  </div>
+</div>
+
+
+<!-- Toast container (global) -->
+<div id="toast-container"></div>
+
+
+<!-- ════════════════════════════════════════════════
+     JAVASCRIPT
+     ════════════════════════════════════════════════ -->
+<script src="js/data.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

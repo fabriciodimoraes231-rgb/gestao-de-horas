@@ -1,0 +1,76 @@
+:root {
+  --primary:       #1A5298;
+  --primary-light: #D6E5FF;
+  --primary-dark:  #0F3460;
+  --accent:        #27AE60;
+  --warning:       #F39C12;
+  --danger:        #C0392B;
+  --bg:            #F5F6F8;
+  --surface:       #FFFFFF;
+  --text:          #3C3C3C;
+  --text-muted:    #8E8E93;
+  --border:        #E2E8F0;
+
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-2xl: 48px;
+
+  --font:    'Inter', system-ui, -apple-system, sans-serif;
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-md: 15px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow:    0 2px 8px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.07);
+
+  --sidebar-width:  240px;
+  --topbar-height:  64px;
+  --radius-sm:  5px;
+  --radius:     8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --transition:    0.18s ease;
+  --transition-md: 0.28s ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  font-family: var(--font);
+  font-size: 15px;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.hidden          { display: none !important; }
+.text-muted      { color: var(--text-muted); }
+.text-primary    { color: var(--primary); }
+.text-accent     { color: var(--accent); }
+.text-warning    { color: var(--warning); }
+.text-danger     { color: var(--danger); }
+.text-sm         { font-size: var(--text-sm); }
+.text-xs         { font-size: var(--text-xs); }
+.font-semibold   { font-weight: 600; }
+.font-bold       { font-weight: 700; }
+.mb-md           { margin-bottom: var(--space-md); }
+.mb-lg           { margin-bottom: var(--space-lg); }
+.mt-md           { margin-top: var(--space-md); }
+.flex            { display: flex; }
+.items-center    { align-items: center; }
+.gap-sm          { gap: var(--space-sm); }
+.gap-md          { gap: var(--space-md); }
+.flex-1          { flex: 1; }
