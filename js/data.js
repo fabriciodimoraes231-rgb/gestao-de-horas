@@ -117,6 +117,11 @@ function statusBadge(status) {
   return '<span class="badge badge-warning">Pendente</span>';
 }
 
+function specialistChip(p) {
+  if (!p?.specialist) return '';
+  return `<span class="specialist-chip" title="${p.specialist.bio}"><i data-lucide="user-check"></i>${p.specialist.name}</span>`;
+}
+
 function progressColor(done, total) {
   const pct = done / total;
   if (pct >= 1.0) return 'over';

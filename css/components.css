@@ -291,6 +291,19 @@ tbody tr:hover   { background: rgba(26,82,152,0.025); }
 .badge-gray     { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
 .badge-purple   { background: rgba(142,68,173,0.12);         color: #8E44AD; }
 
+/* Chip inline de especialista ao lado do nome do projeto */
+.specialist-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--primary-light); color: var(--primary);
+  border-radius: 20px; padding: 2px 8px 2px 6px;
+  font-size: 11px; font-weight: 600; vertical-align: middle;
+  white-space: nowrap; cursor: default;
+  border: 1px solid rgba(26,82,152,0.18);
+  transition: opacity var(--transition);
+}
+.specialist-chip:hover { opacity: .8; }
+.specialist-chip svg { width: 11px; height: 11px; flex-shrink: 0; }
+
 .modal-overlay {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.45);

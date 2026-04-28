@@ -1142,7 +1142,7 @@ function pageDashboardGestor() {
               const resp = DB.users.find(u => u.id === p.responsible);
               return `
                 <tr>
-                  <td><strong>${p.name}</strong></td>
+                  <td><strong>${p.name}</strong> ${specialistChip(p)}</td>
                   <td class="text-sm">${resp?.name || '-'}</td>
                   <td><strong>${p.total}h</strong></td>
                   <td class="text-muted">${p.estimated}h</td>
@@ -1195,13 +1195,8 @@ function pageProjetos() {
               <span class="project-name">${p.name}</span>
               ${statusBadge(p.status)}
             </div>
+            ${specialistChip(p)}
             <p class="project-desc">${p.desc}</p>
-            ${p.specialist ? `
-            <div class="specialist-badge">
-              <i data-lucide="user-check"></i>
-              <span>${p.specialist.name}</span>
-              <span class="specialist-area">${p.specialist.area}</span>
-            </div>` : ''}
             <div class="project-stats">
               <span><strong>${p.total}h</strong> lançadas</span>
               <span><strong>${p.estimated}h</strong> previstas</span>
@@ -1350,6 +1345,7 @@ function pageDetalheProjeto(id) {
         <div style="display:flex;align-items:center;gap:var(--space-sm);margin-bottom:var(--space-sm);">
           <h1 class="detail-title">${p.name}</h1>
           ${statusBadge(p.status)}
+          ${specialistChip(p)}
         </div>
         <p class="detail-desc">${p.desc}</p>
         <div class="detail-meta">
@@ -1598,7 +1594,7 @@ function pageHorasTodos() {
                       <span class="text-sm">${u?.name}</span>
                     </div>
                   </td>
-                  <td><span class="badge badge-primary">${p?.name}</span></td>
+                  <td><span class="badge badge-primary">${p?.name}</span> ${specialistChip(p)}</td>
                   <td><strong>${e.hours}h</strong></td>
                   <td class="text-sm text-muted" style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.justification}</td>
                   <td><span class="badge badge-accent">✓ ${e.status}</span></td>
@@ -1763,7 +1759,7 @@ function pageDashboardColaborador() {
             <div class="recent-item" style="cursor:pointer;" onclick="navigate('lancar-horas')">
               <div class="kpi-icon" style="width:36px;height:36px;border-radius:var(--radius);"><i data-lucide="folder"></i></div>
               <div class="recent-item-info">
-                <div class="recent-item-title">${p.name}</div>
+                <div class="recent-item-title">${p.name} ${specialistChip(p)}</div>
                 <div class="recent-item-sub">${hMes}h lançadas em ${mesLabel}</div>
               </div>
               ${statusBadge(p.status)}
@@ -1876,6 +1872,7 @@ function pageLancarHoras() {
           <div class="lancamento-card-header">
             <i data-lucide="folder"></i>
             <span class="lancamento-projeto-tag">${p.name}</span>
+            ${specialistChip(p)}
             <span class="text-muted text-xs">${p.desc.slice(0,60)}...</span>
             ${jaPossuiHoras > 0 ? `<span class="badge badge-accent" style="margin-left:auto">${jaPossuiHoras}h já registradas</span>` : ''}
           </div>
