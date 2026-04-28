@@ -43,6 +43,20 @@
   padding-top: var(--space-md);
 }
 
+.login-help {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.login-help svg { width: 13px; height: 13px; }
+.login-help a { color: var(--primary); font-weight: 600; }
+.login-help a:hover { text-decoration: underline; }
+
 .login-demo-hint {
   background: rgba(255,255,255,0.12);
   border: 1px solid rgba(255,255,255,0.2);
@@ -70,7 +84,48 @@
   overflow-y: auto;
 }
 
-.sidebar.collapsed { transform: translateX(-100%); }
+/* --- Sidebar mini mode (collapsed to icons only) --- */
+.sidebar.collapsed {
+  width: var(--sidebar-mini);
+}
+
+.sidebar.collapsed .sidebar-header-text,
+.sidebar.collapsed .sidebar-section,
+.sidebar.collapsed .sidebar-user-info,
+.sidebar.collapsed .sidebar-item-label {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-header {
+  justify-content: center;
+  padding: var(--space-md) var(--space-sm);
+}
+
+.sidebar.collapsed .sidebar-item {
+  justify-content: center;
+  padding: 10px;
+}
+
+.sidebar.collapsed .sidebar-item svg {
+  width: 20px;
+  height: 20px;
+}
+
+.sidebar.collapsed .sidebar-nav {
+  padding: var(--space-md) var(--space-xs);
+}
+
+.sidebar.collapsed .sidebar-footer {
+  padding: var(--space-sm);
+}
+
+.sidebar.collapsed .sidebar-user {
+  justify-content: center;
+}
+
+.sidebar.collapsed + .main-wrapper {
+  margin-left: var(--sidebar-mini);
+}
 
 .sidebar-header {
   padding: var(--space-md) var(--space-md);
@@ -152,7 +207,7 @@
   transition: margin-left var(--transition-md);
 }
 
-.main-wrapper.expanded { margin-left: 0; }
+.main-wrapper.expanded { margin-left: var(--sidebar-mini); }
 
 .topbar {
   height: var(--topbar-height);
@@ -217,7 +272,7 @@
 
 .topbar-avatar-wrap:hover { background: var(--bg); }
 
-.notif-btn { position: relative; }
+.notif-wrapper { position: relative; }
 
 .notification-dot {
   width: 8px; height: 8px;
@@ -225,7 +280,73 @@
   border-radius: 50%;
   position: absolute;
   top: 6px; right: 6px;
-  border: 2px solid white;
+  border: 2px solid var(--surface);
+  pointer-events: none;
+}
+
+/* Notification Dropdown */
+.notif-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 360px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 300;
+  animation: dropIn 0.18s ease;
+  overflow: hidden;
+}
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.notif-dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.notif-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+  cursor: pointer;
+}
+
+.notif-item:last-child { border-bottom: none; }
+.notif-item:hover { background: var(--bg); }
+.notif-item.unread { background: rgba(26,82,152,0.03); }
+.notif-item.unread .notif-item-title { font-weight: 600; }
+
+.notif-item-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.notif-item-content { flex: 1; min-width: 0; }
+.notif-item-title { font-size: var(--text-sm); color: var(--text); }
+.notif-item-time { font-size: var(--text-xs); color: var(--text-muted); margin-top: 2px; }
+
+.notif-dropdown-footer {
+  padding: var(--space-sm) var(--space-lg);
+  border-top: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .content {
@@ -290,8 +411,9 @@
 @media (max-width: 768px) {
   .sidebar          { transform: translateX(-100%); }
   .sidebar.mobile-open { transform: translateX(0); }
-  .main-wrapper     { margin-left: 0; }
+  .main-wrapper     { margin-left: 0 !important; }
   .kpi-grid         { grid-template-columns: 1fr; }
   .content          { padding: var(--space-md); }
   .profile-switcher { display: none; }
+  .notif-dropdown   { width: calc(100vw - 32px); right: -60px; }
 }

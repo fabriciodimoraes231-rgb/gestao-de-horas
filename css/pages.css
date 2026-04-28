@@ -38,7 +38,11 @@
   transition: box-shadow var(--transition), border-color var(--transition);
 }
 
-.project-card:hover { box-shadow: var(--shadow-md); border-color: var(--primary-light); }
+.project-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+  transform: translateY(-3px);
+}
 
 .project-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-sm); }
 .project-name  { font-size: var(--text-md); font-weight: 700; color: var(--text); }
@@ -198,3 +202,64 @@
 .stat-row-item { text-align: center; }
 .stat-row-value { font-size: var(--text-xl); font-weight: 700; color: var(--primary); }
 .stat-row-label { font-size: var(--text-xs); color: var(--text-muted); margin-top: 2px; }
+
+/* ══════════════════════════════════════
+   HOURS SUMMARY BAR (lançar horas)
+   ══════════════════════════════════════ */
+.hours-summary {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  flex-wrap: wrap;
+  position: sticky;
+  top: var(--topbar-height);
+  z-index: 10;
+  box-shadow: var(--shadow-sm);
+}
+
+.hours-summary-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.hours-summary-value.over { color: var(--danger); }
+
+.hours-summary-label {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.hours-summary-progress {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* ══════════════════════════════════════
+   BREADCRUMB HIERARCHY
+   ══════════════════════════════════════ */
+.breadcrumb-trail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-sm);
+}
+
+.breadcrumb-trail a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--transition);
+}
+
+.breadcrumb-trail a:hover { color: var(--primary); text-decoration: none; }
+.breadcrumb-trail .breadcrumb-sep { color: var(--border); font-size: var(--text-xs); }
+.breadcrumb-trail .breadcrumb-current { font-weight: 600; color: var(--text); }
+

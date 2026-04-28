@@ -60,24 +60,42 @@ const PAGE_TITLES = {
   'perfil':                'Meu Perfil',
 };
 
+/* Breadcrumb hierarchy map */
+const BREADCRUMB_PARENT = {
+  'detalhe-projeto': { label: 'Projetos', page: 'projetos' },
+  'confirmacao-lancamento': { label: 'Lançar Horas', page: 'lancar-horas' },
+};
+
 function navigate(pageId, params = {}) {
   state.page = pageId;
   state.params = params;
 
-    document.getElementById('breadcrumb').textContent = PAGE_TITLES[pageId] || pageId;
+  // Update breadcrumb with hierarchy
+  const bc = document.getElementById('breadcrumb');
+  const parent = BREADCRUMB_PARENT[pageId];
+  const title = PAGE_TITLES[pageId] || pageId;
+  if (parent) {
+    bc.innerHTML = `<span class="breadcrumb-trail"><a href="#" onclick="navigate('${parent.page}'); return false;">${parent.label}</a><span class="breadcrumb-sep">/</span><span class="breadcrumb-current">${title}</span></span>`;
+  } else {
+    bc.textContent = title;
+  }
 
-    document.querySelectorAll('.sidebar-item').forEach(el => {
+  document.querySelectorAll('.sidebar-item').forEach(el => {
     el.classList.toggle('active', el.dataset.page === pageId);
   });
 
-    const content = document.getElementById('content');
+  const content = document.getElementById('content');
   content.innerHTML = renderPage(pageId, params);
 
-    lucide.createIcons();
+  lucide.createIcons();
   initPageCharts(pageId);
 
-    content.scrollTo(0, 0);
-  window.scrollTo(0, 0);
+  content.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Close notification dropdown if open
+  const notif = document.getElementById('notif-dropdown');
+  if (notif && !notif.classList.contains('hidden')) notif.classList.add('hidden');
 }
 
 function renderPage(pageId, params) {
@@ -91,6 +109,7 @@ function renderPage(pageId, params) {
     'dashboard-gestor':      pageDashboardGestor,
     'projetos':              pageProjetos,
     'detalhe-projeto':       () => pageDetalheProjeto(params.id),
+    'confirmacao-lancamento': pageConfirmacaoLancamento,
     'relatorios':            pageRelatorios,
     'horas-todos':           pageHorasTodos,
     'alocacao':              pageAlocacao,
@@ -133,9 +152,9 @@ function buildSidebar(profile) {
   const items = SIDEBAR_MENUS[profile] || [];
 
   nav.innerHTML = items.map(item => `
-    <button class="sidebar-item" data-page="${item.id}" onclick="navigate('${item.id}')">
+    <button class="sidebar-item" data-page="${item.id}" onclick="navigate('${item.id}')" title="${item.label}">
       <i data-lucide="${item.icon}"></i>
-      ${item.label}
+      <span class="sidebar-item-label">${item.label}</span>
     </button>
   `).join('');
 
@@ -168,6 +187,38 @@ function handleLogout() {
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('collapsed');
   document.querySelector('.main-wrapper').classList.toggle('expanded');
+}
+
+/* Dark mode toggle */
+function toggleDarkMode() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  const icon = document.getElementById('theme-icon');
+  if (icon) {
+    icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+    lucide.createIcons();
+  }
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+}
+
+/* Notifications toggle */
+function toggleNotifications() {
+  const dd = document.getElementById('notif-dropdown');
+  if (!dd) return;
+  dd.classList.toggle('hidden');
+  if (!dd.classList.contains('hidden')) {
+    lucide.createIcons();
+    // Close on outside click
+    setTimeout(() => {
+      document.addEventListener('click', function _close(e) {
+        if (!e.target.closest('.notif-wrapper')) {
+          dd.classList.add('hidden');
+          document.removeEventListener('click', _close);
+        }
+      });
+    }, 10);
+  }
 }
 
 function showToast(title, msg, type = 'success') {
@@ -451,8 +502,8 @@ function pageDashboardAdmin() {
     <div class="grid-7-5">
       <div class="card">
         <div class="card-header">
-          <span class="card-title">Atividade Diária — Lançamentos</span>
-          <span class="badge badge-primary">Última semana</span>
+          <span class="card-title">Submissões Mensais — Lançamentos</span>
+          <span class="badge badge-primary">Últimos 7 meses</span>
         </div>
         <div class="card-body">
           <div class="chart-container"><canvas id="chart-admin-activity"></canvas></div>
@@ -760,60 +811,44 @@ function pageAuditoria() {
     </div>
 
     <div class="filter-bar">
-      <label>Ação:</label>
-      <select><option>Todas</option><option>LOGIN</option><option>CREATE</option><option>UPDATE</option><option>DELETE</option></select>
-      <label>Período:</label>
-      <input type="date" value="2026-04-01">
-      <span>até</span>
-      <input type="date" value="2026-04-27">
-      <label>Usuário:</label>
-      <select>
-        <option>Todos</option>
-        ${DB.users.map(u=>`<option>${u.name}</option>`).join('')}
+      <label for="audit-action">Ação:</label>
+      <select id="audit-action" onchange="filterAuditLogs()"><option value="">Todas</option><option value="LOGIN">LOGIN</option><option value="CREATE">CREATE</option><option value="UPDATE">UPDATE</option><option value="DELETE">DELETE</option></select>
+      <label for="audit-user">Usuário:</label>
+      <select id="audit-user" onchange="filterAuditLogs()">
+        <option value="">Todos</option>
+        ${DB.users.map(u=>`<option value="${u.name}">${u.name}</option>`).join('')}
       </select>
-      <button class="btn btn-primary btn-sm"><i data-lucide="filter"></i> Filtrar</button>
+      <button class="btn btn-primary btn-sm" onclick="filterAuditLogs()"><i data-lucide="filter"></i> Filtrar</button>
     </div>
 
     <div class="card">
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Data / Hora</th>
-              <th>Usuário</th>
-              <th>Ação</th>
-              <th>Entidade</th>
-              <th>Detalhes</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${DB.auditLogs.map(log => {
-              const u = DB.users.find(u => u.name === log.user) || {};
-              return `
-                <tr>
-                  <td class="text-muted text-sm">${log.id}</td>
-                  <td class="text-sm" style="font-family:monospace;">${log.ts}</td>
-                  <td>
-                    <div style="display:flex;align-items:center;gap:8px;">
-                      <div class="avatar avatar-xs ${getAvatarClass(u.role)}">${u.initials||'?'}</div>
-                      <span class="text-sm">${log.user}</span>
-                    </div>
-                  </td>
-                  <td><span class="action-badge action-${log.action.toLowerCase()}">${log.action}</span></td>
-                  <td><span class="badge badge-gray">${log.entity}</span></td>
-                  <td class="text-sm text-muted">${log.detail}</td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
+      <div class="table-wrapper" id="audit-table-wrap">
+        ${auditTable(DB.auditLogs)}
       </div>
       <div class="card-footer">
-        <span class="text-sm text-muted">${DB.auditLogs.length} registros encontrados</span>
+        <span class="text-sm text-muted" id="audit-count">${DB.auditLogs.length} registros encontrados</span>
       </div>
     </div>
   `;
+}
+
+function auditTable(logs) {
+  if (!logs.length) return '<div class="empty-state" style="padding:32px;"><div class="empty-state-title">Nenhum registro</div><p class="text-muted text-sm">Nenhum log encontrado com os filtros selecionados.</p></div>';
+  return `<table><thead><tr><th>#</th><th>Data / Hora</th><th>Usuário</th><th>Ação</th><th>Entidade</th><th>Detalhes</th></tr></thead><tbody>${logs.map(log => {
+    const u = DB.users.find(u => u.name === log.user) || {};
+    return `<tr><td class="text-muted text-sm">${log.id}</td><td class="text-sm" style="font-family:monospace;">${log.ts}</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar avatar-xs ${getAvatarClass(u.role)}">${u.initials||'?'}</div><span class="text-sm">${log.user}</span></div></td><td><span class="action-badge action-${log.action.toLowerCase()}">${log.action}</span></td><td><span class="badge badge-gray">${log.entity}</span></td><td class="text-sm text-muted">${log.detail}</td></tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+function filterAuditLogs() {
+  const action = document.getElementById('audit-action')?.value || '';
+  const user = document.getElementById('audit-user')?.value || '';
+  let filtered = DB.auditLogs;
+  if (action) filtered = filtered.filter(l => l.action === action);
+  if (user) filtered = filtered.filter(l => l.user === user);
+  document.getElementById('audit-table-wrap').innerHTML = auditTable(filtered);
+  document.getElementById('audit-count').textContent = filtered.length + ' registros encontrados';
+  lucide.createIcons();
 }
 
 function pageConfiguracoes() {
@@ -1012,7 +1047,7 @@ function pageDashboardGestor() {
   const totalHoras   = DB.timeEntries.reduce((s, e) => s + e.hours, 0);
   const projAtivos   = DB.projects.filter(p => p.status === 'ativo').length;
   const membros      = new Set(DB.projects.flatMap(p => p.members)).size;
-  const mediaHoras   = (totalHoras / 7).toFixed(1);
+  const mediaHorasMembro = membros > 0 ? (totalHoras / membros).toFixed(1) : 0;
 
   return `
     <div class="page-header">
@@ -1053,8 +1088,8 @@ function pageDashboardGestor() {
       </div>
       <div class="kpi-card purple">
         <div class="kpi-icon"><i data-lucide="activity"></i></div>
-        <div class="kpi-label">Média Horas/Dia</div>
-        <div class="kpi-value">${mediaHoras}</div>
+        <div class="kpi-label">Média Horas/Membro (mês)</div>
+        <div class="kpi-value">${mediaHorasMembro}h</div>
         <div class="kpi-delta up"><i data-lucide="trending-up"></i> Acima da meta</div>
       </div>
     </div>
@@ -1315,7 +1350,7 @@ function pageDetalheProjeto(id) {
     <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:var(--space-xl);">
       <div class="kpi-card">
         <div class="kpi-icon"><i data-lucide="clock"></i></div>
-        <div class="kpi-label">Horas Lançadas</div>
+        <div class="kpi-label">Horas Lançadas (total)</div>
         <div class="kpi-value">${p.total}h</div>
       </div>
       <div class="kpi-card ${color === 'over' ? 'danger' : color === 'near' ? 'warning' : 'accent'}">
@@ -1621,9 +1656,16 @@ function toggleAlloc(userId, projectId, checked) {
 
 function pageDashboardColaborador() {
   const user  = DEMO_USERS.colaborador;
+  const now   = new Date();
+  const meusMes = DB.timeEntries.filter(e => {
+    if (e.userId !== user.id) return false;
+    const p = e.date.split('/');
+    return p.length === 3 && parseInt(p[1],10) === (now.getMonth()+1) && parseInt(p[2],10) === now.getFullYear();
+  });
   const meus  = DB.timeEntries.filter(e => e.userId === user.id);
-  const total = meus.reduce((s, e) => s + e.hours, 0);
+  const total = meusMes.reduce((s, e) => s + e.hours, 0);
   const projs = getProjectsForUser(user.id);
+  const mesLabel = now.toLocaleDateString('pt-BR', { month: 'long' });
 
   return `
     <div class="welcome-card">
@@ -1636,8 +1678,8 @@ function pageDashboardColaborador() {
       </div>
       <div class="welcome-stats">
         <div class="welcome-stat">
-          <div class="welcome-stat-value">${total}</div>
-          <div class="welcome-stat-label">Horas lançadas</div>
+          <div class="welcome-stat-value">${total}h</div>
+          <div class="welcome-stat-label">Horas em ${mesLabel}</div>
         </div>
         <div class="welcome-stat">
           <div class="welcome-stat-value">${projs.length}</div>
@@ -1645,7 +1687,7 @@ function pageDashboardColaborador() {
         </div>
         <div class="welcome-stat">
           <div class="welcome-stat-value">${meus.length}</div>
-          <div class="welcome-stat-label">Lançamentos</div>
+          <div class="welcome-stat-label">Lançamentos totais</div>
         </div>
       </div>
     </div>
@@ -1653,8 +1695,8 @@ function pageDashboardColaborador() {
     <div class="grid-2">
       <div class="card">
         <div class="card-header">
-          <span class="card-title">Horas da Semana</span>
-          <span class="badge badge-primary">Últimos 7 dias</span>
+          <span class="card-title">Horas por Mês</span>
+          <span class="badge badge-primary">Últimos 7 meses</span>
         </div>
         <div class="card-body">
           <div class="chart-container-sm"><canvas id="chart-colab-weekly"></canvas></div>
@@ -1668,16 +1710,22 @@ function pageDashboardColaborador() {
           </button>
         </div>
         <div class="card-body" style="padding:0 var(--space-lg);">
-          ${projs.map(p => `
+          ${projs.map(p => {
+            const hMes = DB.timeEntries.filter(e => {
+              if (e.userId !== user.id || e.projectId !== p.id) return false;
+              const d = e.date.split('/');
+              return d.length === 3 && parseInt(d[1],10) === (now.getMonth()+1) && parseInt(d[2],10) === now.getFullYear();
+            }).reduce((s,e)=>s+e.hours,0);
+            return `
             <div class="recent-item" style="cursor:pointer;" onclick="navigate('lancar-horas')">
               <div class="kpi-icon" style="width:36px;height:36px;border-radius:var(--radius);"><i data-lucide="folder"></i></div>
               <div class="recent-item-info">
                 <div class="recent-item-title">${p.name}</div>
-                <div class="recent-item-sub">${DB.timeEntries.filter(e=>e.userId===user.id&&e.projectId===p.id).reduce((s,e)=>s+e.hours,0)}h lançadas</div>
+                <div class="recent-item-sub">${hMes}h lançadas em ${mesLabel}</div>
               </div>
               ${statusBadge(p.status)}
-            </div>
-          `).join('')}
+            </div>`;
+          }).join('')}
         </div>
       </div>
     </div>
@@ -1716,11 +1764,11 @@ function pageLancarHoras() {
   const user = DEMO_USERS[state.profile] || DEMO_USERS.colaborador;
   const projs = getProjectsForUser(user.id);
 
-    const now = new Date();
+  const now = new Date();
   const mesAtualValue = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
   const mesAtualLabel = now.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 
-    const horasLancadas = {};
+  const horasLancadas = {};
   DB.timeEntries.filter(e => e.userId === user.id).forEach(e => {
     horasLancadas[e.projectId] = (horasLancadas[e.projectId] || 0) + e.hours;
   });
@@ -1736,6 +1784,10 @@ function pageLancarHoras() {
     `;
   }
 
+  // Calculate initial total
+  const initialTotal = projs.reduce((s, p) => s + (horasLancadas[p.id] || 0), 0);
+  const maxHoras = 220;
+
   return `
     <div class="page-header">
       <div>
@@ -1749,10 +1801,28 @@ function pageLancarHoras() {
       <span>Registre o total de horas trabalhadas em cada projeto durante o mês. A submissão mensal deve ser feita até o último dia útil do mês.</span>
     </div>
 
+    <!-- Dynamic Hours Summary Bar -->
+    <div class="hours-summary" id="hours-summary">
+      <div>
+        <div class="hours-summary-value ${initialTotal > maxHoras ? 'over' : ''}" id="hours-total">${initialTotal}h</div>
+        <div class="hours-summary-label">Total lançado</div>
+      </div>
+      <div class="hours-summary-progress">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span class="text-xs text-muted">${projs.length} projeto${projs.length>1?'s':''}</span>
+          <span class="text-xs font-semibold" id="hours-pct">${Math.round(initialTotal/maxHoras*100)}%</span>
+        </div>
+        <div class="progress" style="height:10px;">
+          <div class="progress-bar ${initialTotal > maxHoras ? 'over' : initialTotal > maxHoras*0.85 ? 'near' : 'ok'}" id="hours-bar" style="width:${Math.min(initialTotal/maxHoras*100,100)}%"></div>
+        </div>
+        <div class="text-xs text-muted" style="margin-top:4px;">Máximo recomendado: ${maxHoras}h/mês</div>
+      </div>
+    </div>
+
     <form onsubmit="submitLancamento(event)">
       <div class="form-group">
-        <label class="form-label required">Mês de referência</label>
-        <input class="form-input" type="month" value="${mesAtualValue}" style="max-width:220px;">
+        <label class="form-label required" for="mes-ref">Mês de referência</label>
+        <input class="form-input" type="month" id="mes-ref" value="${mesAtualValue}" style="max-width:220px;">
         <span class="form-hint">Selecione o mês para o qual está lançando as horas</span>
       </div>
 
@@ -1768,15 +1838,16 @@ function pageLancarHoras() {
           </div>
           <div class="form-row">
             <div class="form-group" style="margin:0;">
-              <label class="form-label required">Total de horas no mês</label>
-              <input class="form-input" type="number" min="1" max="220" step="0.5"
-                placeholder="Ex: 80" id="hours-${i}" value="${jaPossuiHoras || ''}">
+              <label class="form-label required" for="hours-${i}">Total de horas no mês</label>
+              <input class="form-input hours-input" type="number" min="0" max="220" step="0.5"
+                placeholder="Ex: 80" id="hours-${i}" value="${jaPossuiHoras || ''}"
+                oninput="updateHoursSummary(${projs.length})">
               <span class="form-hint">Horas totais dedicadas a este projeto no mês · Máx. 220h/mês</span>
             </div>
             <div></div>
           </div>
           <div class="form-group" style="margin-top:var(--space-md);margin-bottom:0;">
-            <label class="form-label required">Resumo das atividades realizadas no mês</label>
+            <label class="form-label required" for="just-${i}">Resumo das atividades realizadas no mês</label>
             <textarea class="form-textarea" rows="3" placeholder="Descreva as principais atividades realizadas neste projeto durante o mês..." id="just-${i}"></textarea>
           </div>
         </div>
@@ -1797,6 +1868,31 @@ function pageLancarHoras() {
       </div>
     </form>
   `;
+}
+
+/* Dynamic hours summary updater */
+function updateHoursSummary(count) {
+  let total = 0;
+  for (let i = 0; i < count; i++) {
+    const el = document.getElementById('hours-' + i);
+    if (el) total += parseFloat(el.value) || 0;
+  }
+  const max = 220;
+  const pct = Math.round(total / max * 100);
+  const color = total > max ? 'over' : total > max * 0.85 ? 'near' : 'ok';
+
+  const totalEl = document.getElementById('hours-total');
+  const pctEl = document.getElementById('hours-pct');
+  const barEl = document.getElementById('hours-bar');
+  if (totalEl) {
+    totalEl.textContent = total + 'h';
+    totalEl.className = 'hours-summary-value' + (total > max ? ' over' : '');
+  }
+  if (pctEl) pctEl.textContent = pct + '%';
+  if (barEl) {
+    barEl.style.width = Math.min(pct, 100) + '%';
+    barEl.className = 'progress-bar ' + color;
+  }
 }
 
 function submitLancamento(e) {
@@ -1967,26 +2063,18 @@ function pagePerfil() {
 const _originalRenderPage = renderPage;
 
 document.addEventListener('DOMContentLoaded', () => {
-    const _origNavigate = navigate;
+  // Restore saved theme
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) {
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.setAttribute('data-lucide', savedTheme === 'dark' ? 'sun' : 'moon');
+  }
 
-    const style = document.createElement('style');
-  style.textContent = `
-    .spin { animation: spin 0.8s linear infinite; display: inline-block; }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    .mb-md { margin-bottom: var(--space-md); }
-  `;
-  document.head.appendChild(style);
+  lucide.createIcons();
 
-    lucide.createIcons();
-
-    window.submitLancamento = function(e) {
+  window.submitLancamento = function(e) {
     e.preventDefault();
-        const ok = true;
-    if (ok) {
-      const content = document.getElementById('content');
-      content.innerHTML = pageConfirmacaoLancamento();
-      lucide.createIcons();
-      document.getElementById('breadcrumb').textContent = 'Confirmação';
-    }
+    navigate('confirmacao-lancamento');
   };
 });

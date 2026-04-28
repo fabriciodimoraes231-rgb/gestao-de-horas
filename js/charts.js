@@ -33,6 +33,16 @@ function baseOptions(extras = {}) {
   return {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 800,
+      easing: 'easeOutQuart',
+      delay: (context) => {
+        if (context.type === 'data' && context.mode === 'default') {
+          return context.dataIndex * 80 + context.datasetIndex * 200;
+        }
+        return 0;
+      },
+    },
     plugins: {
       legend: { display: false },
       tooltip: {
@@ -78,12 +88,12 @@ function _initAdminCharts() {
   chartInstances['admin-activity'] = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: DB.chartData.atividadeDiaria.labels,
+      labels: DB.chartData.atividadeMensal.labels,
       datasets: [{
         label: 'Lançamentos',
-        data: DB.chartData.atividadeDiaria.values,
-        backgroundColor: DB.chartData.atividadeDiaria.values.map((_, i) =>
-          i === 6 ? CHART_COLORS.primary : CHART_COLORS.primaryAlpha),
+        data: DB.chartData.atividadeMensal.values,
+        backgroundColor: DB.chartData.atividadeMensal.values.map((_, i) =>
+          i === DB.chartData.atividadeMensal.labels.length - 1 ? CHART_COLORS.primary : CHART_COLORS.primaryAlpha),
         borderColor: CHART_COLORS.primary,
         borderWidth: 1.5,
         borderRadius: 6,
@@ -159,11 +169,11 @@ function _initColaboradorCharts() {
   chartInstances['colab-weekly'] = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: DB.chartData.minhasHoras.labels,
+      labels: DB.chartData.minhasHorasMensais.labels,
       datasets: [{
         label: 'Horas',
-        data: DB.chartData.minhasHoras.values,
-        backgroundColor: DB.chartData.minhasHoras.labels.map((_, i) =>
+        data: DB.chartData.minhasHorasMensais.values,
+        backgroundColor: DB.chartData.minhasHorasMensais.labels.map((_, i) =>
           i === 6 ? CHART_COLORS.primary : CHART_COLORS.primaryAlpha),
         borderColor: CHART_COLORS.primary,
         borderWidth: 1.5,
@@ -174,7 +184,7 @@ function _initColaboradorCharts() {
     options: {
       ...baseOptions(),
       scales: {
-        y: { beginAtZero: true, max: 12, grid: { color: CHART_COLORS.grid }, ticks: { stepSize: 4, font: { family: 'Inter', size: 11 } } },
+        y: { beginAtZero: true, grid: { color: CHART_COLORS.grid }, ticks: { font: { family: 'Inter', size: 11 } } },
         x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11 } } },
       },
     },

@@ -57,13 +57,13 @@ const DB = {
       labels: ['Carlos', 'Fernanda', 'Ricardo', 'Luciana'],
       values: [136, 124, 98, 88],
     },
-        atividadeDiaria: {
-      labels: ['21/Abr', '22/Abr', '23/Abr', '24/Abr', '25/Abr', '26/Abr', 'Hoje'],
-      values: [8, 12, 11, 9, 14, 10, 6],
+        atividadeMensal: {
+      labels: ['Out', 'Nov', 'Dez', 'Jan', 'Fev', 'Mar', 'Abr'],
+      values: [42, 55, 38, 61, 58, 67, 70],
     },
-        minhasHoras: {
-      labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Seg', 'Hoje'],
-      values: [4, 6, 5, 7, 8, 4, 8],
+        minhasHorasMensais: {
+      labels: ['Out', 'Nov', 'Dez', 'Jan', 'Fev', 'Mar', 'Abr'],
+      values: [72, 80, 64, 88, 96, 104, 42],
     },
   },
 };

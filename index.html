@@ -1,9 +1,15 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sistema de Controle de Horas — Envision Pesquisa & Desenvolvimento. Gerencie horas, projetos e equipes com eficiência.">
+  <meta property="og:title" content="Sistema de Controle de Horas — Envision P&D">
+  <meta property="og:description" content="Protótipo interativo do sistema de controle de horas para P&D.">
   <title>Sistema de Controle de Horas — Envision P&D</title>
+
+  <!-- Favicon SVG -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'%3E%3Crect width='52' height='52' rx='13' fill='%231A5298'/%3E%3Ctext x='26' y='36' text-anchor='middle' fill='white' font-family='Inter,sans-serif' font-size='24' font-weight='700'%3EE%3C/text%3E%3C/svg%3E">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,6 +28,9 @@
   <script src="https://unpkg.com/lucide@0.363.0/dist/umd/lucide.min.js"></script>
 </head>
 <body>
+
+<!-- Skip Link para acessibilidade -->
+<a href="#content" class="skip-link">Pular para o conteúdo principal</a>
 
 <!-- ════════════════════════════════════════════════
      TELA DE LOGIN
@@ -48,12 +57,12 @@
 
     <form onsubmit="handleLogin(event)" autocomplete="off">
       <div class="form-group">
-        <label class="form-label">E-mail corporativo</label>
-        <input type="email" class="form-input" placeholder="nome@envision.com" value="manuel@envision.com" required>
+        <label class="form-label" for="login-email">E-mail corporativo</label>
+        <input type="email" id="login-email" class="form-input" placeholder="nome@envision.com" value="manuel@envision.com" required>
       </div>
       <div class="form-group">
-        <label class="form-label">Senha</label>
-        <input type="password" class="form-input" placeholder="••••••••" value="••••••••" required>
+        <label class="form-label" for="login-password">Senha</label>
+        <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
       </div>
       <button type="submit" class="btn btn-primary btn-full btn-lg" id="btn-login">
         <i data-lucide="log-in"></i>
@@ -64,6 +73,10 @@
     <div class="login-footer">
       <i data-lucide="shield-check"></i>
       <span>Autenticação segura gerenciada pelo Keycloak</span>
+    </div>
+    <div class="login-help">
+      <i data-lucide="help-circle"></i>
+      <span>Problemas de acesso? <a href="#" onclick="showToast('Suporte','Contate o time de TI: ti@envision.com','info'); return false;">Contate o TI</a></span>
     </div>
   </div>
 
@@ -80,19 +93,19 @@
 <div id="app-shell" class="app-shell hidden">
 
   <!-- ── Sidebar ── -->
-  <aside id="sidebar" class="sidebar">
+  <aside id="sidebar" class="sidebar" role="navigation" aria-label="Menu principal">
     <div class="sidebar-header">
       <svg width="34" height="34" viewBox="0 0 52 52" fill="none">
         <rect width="52" height="52" rx="12" fill="white" fill-opacity="0.12"/>
         <text x="26" y="36" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-size="22" font-weight="700">E</text>
       </svg>
-      <div>
+      <div class="sidebar-header-text">
         <div class="sidebar-brand">Envision</div>
         <div class="sidebar-subbrand">P&amp;D — RD2</div>
       </div>
     </div>
 
-    <nav id="sidebar-nav" class="sidebar-nav">
+    <nav id="sidebar-nav" class="sidebar-nav" aria-label="Navegação do sistema">
       <!-- Populado por JS (buildSidebar) -->
     </nav>
 
@@ -130,9 +143,55 @@
           </div>
         </div>
 
-        <button class="btn-icon" title="Notificações" style="position:relative;">
-          <i data-lucide="bell"></i>
-          <span class="notification-dot"></span>
+        <div class="notif-wrapper">
+          <button class="btn-icon" title="Notificações" aria-label="Notificações" aria-haspopup="true" onclick="toggleNotifications()" style="position:relative;">
+            <i data-lucide="bell"></i>
+            <span class="notification-dot"></span>
+          </button>
+          <div id="notif-dropdown" class="notif-dropdown hidden" role="menu" aria-label="Notificações">
+            <div class="notif-dropdown-header">
+              <span class="font-semibold text-sm">Notificações</span>
+              <span class="badge badge-primary">3 novas</span>
+            </div>
+            <div class="notif-list">
+              <div class="notif-item unread">
+                <i data-lucide="clock" class="notif-item-icon text-warning"></i>
+                <div class="notif-item-content">
+                  <div class="notif-item-title">Ana Silva submeteu horas</div>
+                  <div class="notif-item-time">Há 2 horas</div>
+                </div>
+              </div>
+              <div class="notif-item unread">
+                <i data-lucide="alert-triangle" class="notif-item-icon text-danger"></i>
+                <div class="notif-item-content">
+                  <div class="notif-item-title">Projeto Delta excedeu o orçamento</div>
+                  <div class="notif-item-time">Há 5 horas</div>
+                </div>
+              </div>
+              <div class="notif-item unread">
+                <i data-lucide="user-plus" class="notif-item-icon text-accent"></i>
+                <div class="notif-item-content">
+                  <div class="notif-item-title">Luciana Ferreira criada no sistema</div>
+                  <div class="notif-item-time">Ontem</div>
+                </div>
+              </div>
+              <div class="notif-item">
+                <i data-lucide="check-circle" class="notif-item-icon text-accent"></i>
+                <div class="notif-item-content">
+                  <div class="notif-item-title">Backup realizado com sucesso</div>
+                  <div class="notif-item-time">Ontem 03:00</div>
+                </div>
+              </div>
+            </div>
+            <div class="notif-dropdown-footer">
+              <button class="btn btn-ghost btn-sm btn-full" onclick="toggleNotifications(); showToast('Notificações','Todas marcadas como lidas.','info')">Marcar todas como lidas</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dark Mode Toggle -->
+        <button class="btn-icon" title="Alternar tema" aria-label="Alternar modo escuro" onclick="toggleDarkMode()">
+          <i data-lucide="moon" id="theme-icon"></i>
         </button>
 
         <div class="topbar-user" onclick="navigate('perfil')">
@@ -148,7 +207,7 @@
     </header>
 
     <!-- ── Conteúdo principal ── -->
-    <main id="content" class="content">
+    <main id="content" class="content" role="main" aria-live="polite">
       <!-- Renderizado dinamicamente por navigate() em app.js -->
     </main>
 
