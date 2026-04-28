@@ -387,10 +387,13 @@ function pageSubmissoesMensais() {
               <th style="text-align:right;">Total Horas</th>
               <th>Projetos com Lançamento</th>
               <th style="text-align:center;">Registros</th>
+              <th style="text-align:center;">Evidências</th>
             </tr>
           </thead>
           <tbody>
-            ${dados.map(d => `
+            ${dados.map(d => {
+              const qtdEv = Object.keys(DB.evidencias).filter(k => k.startsWith(d.user.id + '_')).length;
+              return `
               <tr>
                 <td>
                   <div style="display:flex;align-items:center;gap:var(--space-sm);">
@@ -418,14 +421,21 @@ function pageSubmissoesMensais() {
                 <td style="text-align:center;">
                   <span class="badge ${d.qtdLancamentos > 0 ? 'badge-primary' : 'badge-gray'}">${d.qtdLancamentos}</span>
                 </td>
-              </tr>
-            `).join('')}
+                <td style="text-align:center;">
+                  ${qtdEv > 0
+                    ? `<button class="btn btn-ghost btn-sm" onclick="modalVerEvidencias(${d.user.id})">
+                        <i data-lucide="paperclip"></i> Ver (${qtdEv})
+                       </button>`
+                    : '<span class="text-muted text-xs">—</span>'}
+                </td>
+              </tr>`;
+            }).join('')}
           </tbody>
           <tfoot>
             <tr style="background:var(--primary-light);">
               <td colspan="3" style="font-weight:700;padding:10px 16px;">Total</td>
               <td style="text-align:right;font-weight:700;font-size:var(--text-md);padding:10px 16px;">${totalHoras}h</td>
-              <td colspan="2" style="padding:10px 16px;font-size:var(--text-sm);color:var(--text-muted);">${submeteram} de ${usuarios.length} membros submeteram</td>
+              <td colspan="3" style="padding:10px 16px;font-size:var(--text-sm);color:var(--text-muted);">${submeteram} de ${usuarios.length} membros submeteram</td>
             </tr>
           </tfoot>
         </table>
@@ -1555,12 +1565,15 @@ function pageHorasTodos() {
               <th>Horas</th>
               <th>Justificativa</th>
               <th>Status</th>
+              <th style="text-align:center;">Evidência</th>
             </tr>
           </thead>
           <tbody>
             ${DB.timeEntries.map(e => {
               const u = DB.users.find(x=>x.id===e.userId);
               const p = DB.projects.find(x=>x.id===e.projectId);
+              const evKey = `${e.userId}_${e.projectId}`;
+              const temEv = !!DB.evidencias[evKey];
               return `
                 <tr>
                   <td class="text-sm" style="font-family:monospace;">${e.date}</td>
@@ -1574,6 +1587,13 @@ function pageHorasTodos() {
                   <td><strong>${e.hours}h</strong></td>
                   <td class="text-sm text-muted" style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.justification}</td>
                   <td><span class="badge badge-accent">✓ ${e.status}</span></td>
+                  <td style="text-align:center;">
+                    ${temEv
+                      ? `<button class="btn btn-ghost btn-sm" onclick="modalVerEvidencias(${e.userId})">
+                           <i data-lucide="paperclip"></i>
+                         </button>`
+                      : '<span class="text-muted text-xs">—</span>'}
+                  </td>
                 </tr>
               `;
             }).join('')}
@@ -1850,6 +1870,24 @@ function pageLancarHoras() {
             <label class="form-label required" for="just-${i}">Resumo das atividades realizadas no mês</label>
             <textarea class="form-textarea" rows="3" placeholder="Descreva as principais atividades realizadas neste projeto durante o mês..." id="just-${i}"></textarea>
           </div>
+          <div class="form-group" style="margin-top:var(--space-md);margin-bottom:0;">
+            <label class="form-label" for="evidencia-${i}">
+              Evidência &nbsp;<span class="badge badge-gray" style="font-weight:400;font-size:11px;">opcional</span>
+            </label>
+            <div class="evidencia-upload" id="evidencia-drop-${i}"
+              onclick="document.getElementById('evidencia-file-${i}').click()"
+              ondragover="event.preventDefault();this.style.borderColor='var(--primary)'"
+              ondragleave="this.style.borderColor=''"
+              ondrop="event.preventDefault();this.style.borderColor='';handleEvidencia(${i},${p.id},{files:event.dataTransfer.files})">
+              <i data-lucide="paperclip"></i>
+              <span>Clique ou arraste um arquivo</span>
+              <span class="text-xs" style="color:var(--text-muted);">Imagem, PDF, Word ou vídeo &nbsp;·&nbsp; Máx. 10 MB</span>
+              <input type="file" id="evidencia-file-${i}"
+                accept="image/*,.pdf,.doc,.docx,video/mp4,video/webm"
+                style="display:none;" onchange="handleEvidencia(${i},${p.id},this)">
+            </div>
+            <div id="evidencia-preview-${i}" class="evidencia-preview" style="display:none;"></div>
+          </div>
         </div>
       `}).join('')}
 
@@ -1895,8 +1933,128 @@ function updateHoursSummary(count) {
   }
 }
 
+window._pendingEvidencias = {};
+
+function _evidenciaIcon(type) {
+  if (type.startsWith('image/')) return 'image';
+  if (type.startsWith('video/')) return 'video';
+  if (type === 'application/pdf') return 'file-text';
+  return 'file';
+}
+
+function handleEvidencia(idx, projectId, input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const maxSize = 10 * 1024 * 1024;
+  if (file.size > maxSize) {
+    showToast('Arquivo muito grande', 'O arquivo não pode exceder 10 MB.', 'error');
+    if (input.value !== undefined) input.value = '';
+    return;
+  }
+  const allowed = ['image/', 'video/mp4', 'video/webm', 'application/pdf',
+    'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+  const ok = allowed.some(t => file.type.startsWith(t) || file.type === t);
+  if (!ok) {
+    showToast('Formato não suportado', 'Use imagem, PDF, Word ou vídeo MP4/WebM.', 'error');
+    if (input.value !== undefined) input.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const key = `${DEMO_USERS.colaborador.id}_${projectId}`;
+    window._pendingEvidencias[key] = { name: file.name, type: file.type, size: file.size, dataURL: ev.target.result };
+    const iconName = _evidenciaIcon(file.type);
+    const preview = document.getElementById('evidencia-preview-' + idx);
+    const drop    = document.getElementById('evidencia-drop-' + idx);
+    if (preview) {
+      preview.style.display = 'flex';
+      preview.innerHTML = `
+        <div class="evidencia-file-icon"><i data-lucide="${iconName}"></i></div>
+        <div class="evidencia-file-info">
+          <span class="evidencia-file-name">${file.name}</span>
+          <span class="evidencia-file-size">${(file.size/1024).toFixed(0)} KB · ${file.type.split('/')[1].toUpperCase()}</span>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="removeEvidencia(${idx},${projectId})">
+          <i data-lucide="x"></i>
+        </button>`;
+      lucide.createIcons();
+    }
+    if (drop) drop.style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeEvidencia(idx, projectId) {
+  const key = `${DEMO_USERS.colaborador.id}_${projectId}`;
+  delete window._pendingEvidencias[key];
+  const preview = document.getElementById('evidencia-preview-' + idx);
+  const drop    = document.getElementById('evidencia-drop-' + idx);
+  const inp     = document.getElementById('evidencia-file-' + idx);
+  if (preview) preview.style.display = 'none';
+  if (drop)    drop.style.display = 'flex';
+  if (inp)     inp.value = '';
+}
+
+function modalVerEvidencias(userId) {
+  const user = DB.users.find(u => u.id === userId);
+  const prefix = userId + '_';
+  const evs = Object.entries(DB.evidencias)
+    .filter(([k]) => k.startsWith(prefix))
+    .map(([k, v]) => ({ projectId: parseInt(k.split('_')[1]), ...v }));
+  if (!evs.length) {
+    showToast('Sem evidências', 'Este colaborador não anexou evidências nesta sessão.', 'info');
+    return;
+  }
+  const rows = evs.map(ev => {
+    const proj = DB.projects.find(p => p.id === ev.projectId);
+    let mediaHtml = '';
+    if (ev.type.startsWith('image/')) {
+      mediaHtml = `<img src="${ev.dataURL}" alt="${ev.name}" style="max-width:100%;border-radius:var(--radius);margin-top:8px;">`;
+    } else if (ev.type.startsWith('video/')) {
+      mediaHtml = `<video src="${ev.dataURL}" controls style="max-width:100%;border-radius:var(--radius);margin-top:8px;"></video>`;
+    } else if (ev.type === 'application/pdf') {
+      mediaHtml = `<iframe src="${ev.dataURL}" style="width:100%;height:320px;border-radius:var(--radius);border:1px solid var(--border);margin-top:8px;"></iframe>`;
+    } else {
+      mediaHtml = `<div class="alert alert-info" style="margin-top:8px;"><i data-lucide="file"></i><span>Pré-visualização não disponível para este formato.</span></div>`;
+    }
+    return `
+      <div style="margin-bottom:var(--space-lg);padding-bottom:var(--space-lg);border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:var(--space-sm);flex-wrap:wrap;">
+          <span class="badge badge-primary">${proj?.name || '—'}</span>
+          <span class="text-sm" style="font-weight:600;">${ev.name}</span>
+          <span class="text-xs text-muted">${(ev.size/1024).toFixed(0)} KB</span>
+          <a href="${ev.dataURL}" download="${ev.name}" class="btn btn-ghost btn-sm" style="margin-left:auto;">
+            <i data-lucide="download"></i> Baixar
+          </a>
+        </div>
+        ${mediaHtml}
+      </div>`;
+  }).join('');
+
+  document.body.insertAdjacentHTML('beforeend', `
+    <div class="modal-overlay" id="modal-evidencias" onclick="if(event.target===this)closeModalEvidencias()">
+      <div class="modal" style="max-width:660px;width:92%;max-height:85vh;display:flex;flex-direction:column;">
+        <div class="modal-header">
+          <span class="modal-title"><i data-lucide="paperclip" style="width:16px;height:16px;margin-right:6px;vertical-align:middle;"></i>Evidências — ${user?.name}</span>
+          <button class="btn btn-ghost btn-sm" onclick="closeModalEvidencias()"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body" style="overflow-y:auto;">${rows}</div>
+      </div>
+    </div>`);
+  lucide.createIcons();
+}
+
+function closeModalEvidencias() {
+  const m = document.getElementById('modal-evidencias');
+  if (m) m.remove();
+}
+
 function submitLancamento(e) {
   e.preventDefault();
+  if (window._pendingEvidencias && Object.keys(window._pendingEvidencias).length) {
+    Object.assign(DB.evidencias, window._pendingEvidencias);
+    window._pendingEvidencias = {};
+  }
   navigate('confirmacao-lancamento');
 }
 

@@ -563,3 +563,25 @@ tbody tr:hover   { background: rgba(26,82,152,0.025); }
 }
 
 .topbar-user:hover { background: var(--bg); }
+
+.evidencia-upload {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: var(--space-lg); cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+  color: var(--text-muted); font-size: var(--text-sm); text-align: center;
+  background: var(--bg);
+}
+.evidencia-upload:hover { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+.evidencia-upload svg  { width: 22px; height: 22px; }
+
+.evidencia-preview {
+  display: flex; align-items: center; gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg); border-radius: var(--radius);
+  border: 1px solid var(--border); margin-top: var(--space-xs);
+}
+.evidencia-file-icon svg { width: 20px; height: 20px; color: var(--primary); flex-shrink: 0; }
+.evidencia-file-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.evidencia-file-name { font-size: var(--text-sm); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.evidencia-file-size { font-size: 11px; color: var(--text-muted); }

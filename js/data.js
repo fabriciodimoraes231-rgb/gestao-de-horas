@@ -66,6 +66,8 @@ const DB = {
       values: [72, 80, 64, 88, 96, 104, 42],
     },
   },
+
+  evidencias: {},
 };
 
 function getUserById(id) {
