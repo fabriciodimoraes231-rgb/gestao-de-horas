@@ -1189,12 +1189,19 @@ function pageProjetos() {
         const color = progressColor(p.total, p.estimated);
         const resp = DB.users.find(u => u.id === p.responsible);
         return `
-          <div class="project-card" onclick="navigate('detalhe-projeto', {id: ${p.id}})">
+          <div class="project-card" onclick="navigate('detalhe-projeto', {id: ${p.id}})"
+               title="Inspirado por: ${p.specialist?.name}">
             <div class="project-card-header">
               <span class="project-name">${p.name}</span>
               ${statusBadge(p.status)}
             </div>
             <p class="project-desc">${p.desc}</p>
+            ${p.specialist ? `
+            <div class="specialist-badge">
+              <i data-lucide="user-check"></i>
+              <span>${p.specialist.name}</span>
+              <span class="specialist-area">${p.specialist.area}</span>
+            </div>` : ''}
             <div class="project-stats">
               <span><strong>${p.total}h</strong> lançadas</span>
               <span><strong>${p.estimated}h</strong> previstas</span>
@@ -1350,6 +1357,14 @@ function pageDetalheProjeto(id) {
           <span class="detail-meta-item">Início: <strong>${p.start}</strong></span>
           <span class="detail-meta-item">Membros: <strong>${p.members.length}</strong></span>
         </div>
+        ${p.specialist ? `
+        <div class="specialist-card">
+          <div class="specialist-card-icon"><i data-lucide="award"></i></div>
+          <div>
+            <div class="specialist-card-name">Inspirado em <strong>${p.specialist.name}</strong> · <span>${p.specialist.area}</span></div>
+            <div class="specialist-card-bio">${p.specialist.bio}</div>
+          </div>
+        </div>` : ''}
       </div>
       <div style="display:flex;gap:var(--space-sm);">
         <button class="btn btn-secondary" onclick="modalEditarProjeto(${p.id})"><i data-lucide="pencil"></i> Editar</button>

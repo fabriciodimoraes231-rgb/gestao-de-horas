@@ -46,7 +46,30 @@
 
 .project-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-sm); }
 .project-name  { font-size: var(--text-md); font-weight: 700; color: var(--text); }
-.project-desc  { font-size: var(--text-xs); color: var(--text-muted); margin-bottom: var(--space-md); line-height: 1.5; }
+.project-desc  { font-size: var(--text-xs); color: var(--text-muted); margin-bottom: var(--space-sm); line-height: 1.5; }
+
+.specialist-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--primary-light); color: var(--primary);
+  border-radius: 20px; padding: 3px 10px 3px 7px;
+  font-size: 11px; font-weight: 600; margin-bottom: var(--space-md);
+  max-width: 100%; overflow: hidden;
+}
+.specialist-badge svg  { width: 12px; height: 12px; flex-shrink: 0; }
+.specialist-area { font-weight: 400; color: var(--primary); opacity: .75; }
+
+.specialist-card {
+  display: flex; align-items: flex-start; gap: var(--space-md);
+  background: var(--primary-light); border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--space-md); margin-top: var(--space-md);
+}
+.specialist-card-icon { width: 34px; height: 34px; flex-shrink: 0; background: var(--primary); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; }
+.specialist-card-icon svg { width: 16px; height: 16px; color: white; }
+.specialist-card-name { font-size: var(--text-sm); color: var(--primary); margin-bottom: 4px; }
+.specialist-card-name span { font-weight: 400; opacity: .8; }
+.specialist-card-bio  { font-size: var(--text-xs); color: var(--text-muted); line-height: 1.6; }
 .project-stats { display: flex; gap: var(--space-md); font-size: var(--text-xs); color: var(--text-muted); margin-bottom: var(--space-md); }
 .project-stat strong { color: var(--text); font-weight: 700; }
 

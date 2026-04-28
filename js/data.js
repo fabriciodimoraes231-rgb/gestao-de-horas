@@ -12,11 +12,16 @@ const DB = {
   ],
 
   projects: [
-    { id: 1, name: 'Projeto Alpha',   desc: 'Desenvolvimento do módulo principal do sistema de controle de horas',   status: 'ativo',   responsible: 2, members: [3, 4, 5],    total: 320, estimated: 400, start: '01/03/2026' },
-    { id: 2, name: 'Projeto Beta',    desc: 'Integração com sistemas e APIs legadas do departamento de P&D',          status: 'ativo',   responsible: 2, members: [3, 5, 8],    total: 180, estimated: 200, start: '15/03/2026' },
-    { id: 3, name: 'Projeto Gamma',   desc: 'Análise de requisitos, documentação técnica e pesquisa UX',              status: 'ativo',   responsible: 7, members: [4],          total: 95,  estimated: 120, start: '01/04/2026' },
-    { id: 4, name: 'Projeto Delta',   desc: 'Refatoração e modernização do módulo de relatórios (concluído)',         status: 'inativo', responsible: 2, members: [3],          total: 440, estimated: 400, start: '01/01/2026' },
-    { id: 5, name: 'Projeto Epsilon', desc: 'Pesquisa e prova de conceito de novas tecnologias para inovação em P&D', status: 'ativo',   responsible: 7, members: [4, 5, 8],    total: 67,  estimated: 160, start: '01/04/2026' },
+    { id: 1, name: 'Projeto Alpha',   desc: 'Desenvolvimento do módulo principal do sistema de controle de horas',    status: 'ativo',   responsible: 2, members: [3, 4, 5], total: 320, estimated: 400, start: '01/03/2026',
+      specialist: { name: 'Ada Lovelace',      area: 'Programação',            bio: 'Considerada a primeira programadora da história, Ada escreveu o primeiro algoritmo destinado a ser processado por uma máquina, em 1843.' } },
+    { id: 2, name: 'Projeto Beta',    desc: 'Integração com sistemas e APIs legadas do departamento de P&D',           status: 'ativo',   responsible: 2, members: [3, 5, 8], total: 180, estimated: 200, start: '15/03/2026',
+      specialist: { name: 'Grace Hopper',      area: 'Compiladores & COBOL',   bio: 'Almirante e cientista da computação que criou o primeiro compilador e foi pioneira no desenvolvimento do COBOL, tornando a programação acessível.' } },
+    { id: 3, name: 'Projeto Gamma',   desc: 'Análise de requisitos, documentação técnica e pesquisa UX',               status: 'ativo',   responsible: 7, members: [4],       total: 95,  estimated: 120, start: '01/04/2026',
+      specialist: { name: 'Barbara Liskov',    area: 'Engenharia de Software',  bio: 'Vencedora do Prêmio Turing, Barbara criou o Princípio de Substituição de Liskov (LSP) e foi pioneira em linguagens de programação orientadas a objetos.' } },
+    { id: 4, name: 'Projeto Delta',   desc: 'Refatoração e modernização do módulo de relatórios (concluído)',          status: 'inativo', responsible: 2, members: [3],       total: 440, estimated: 400, start: '01/01/2026',
+      specialist: { name: 'Margaret Hamilton', area: 'Engenharia de Software',  bio: 'Cunhou o termo "engenharia de software" e liderou o desenvolvimento do software de voo do Apollo 11, garantindo a chegada do homem à Lua em 1969.' } },
+    { id: 5, name: 'Projeto Epsilon', desc: 'Pesquisa e prova de conceito de novas tecnologias para inovação em P&D',  status: 'ativo',   responsible: 7, members: [4, 5, 8], total: 67,  estimated: 160, start: '01/04/2026',
+      specialist: { name: 'Katherine Johnson', area: 'Computação Científica',   bio: 'Matemática da NASA cujos cálculos orbitais foram fundamentais para o sucesso das missões Mercury e Apollo — popularizada pelo filme "Estrelas Além do Tempo".' } },
   ],
 
   timeEntries: [
