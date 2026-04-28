@@ -1712,6 +1712,17 @@ function pageDashboardColaborador() {
       </div>
     </div>
 
+    <div class="lancar-cta" onclick="navigate('lancar-horas')">
+      <div class="lancar-cta-icon"><i data-lucide="folder-open"></i></div>
+      <div class="lancar-cta-text">
+        <div class="lancar-cta-title">Lançar Horas do Mês</div>
+        <div class="lancar-cta-sub">Registre suas horas de ${mesLabel.charAt(0).toUpperCase()+mesLabel.slice(1)} · Submissão mensal</div>
+      </div>
+      <button class="lancar-cta-btn" onclick="event.stopPropagation();navigate('lancar-horas')">
+        <i data-lucide="plus-circle"></i> Lançar Horas
+      </button>
+    </div>
+
     <div class="grid-2">
       <div class="card">
         <div class="card-header">
@@ -1725,9 +1736,6 @@ function pageDashboardColaborador() {
       <div class="card">
         <div class="card-header">
           <span class="card-title">Meus Projetos</span>
-          <button class="btn btn-primary btn-sm" onclick="navigate('lancar-horas')">
-            <i data-lucide="plus"></i> Lançar Horas
-          </button>
         </div>
         <div class="card-body" style="padding:0 var(--space-lg);">
           ${projs.map(p => {
