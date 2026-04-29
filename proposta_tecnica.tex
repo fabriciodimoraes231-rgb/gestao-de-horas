@@ -1,0 +1,824 @@
+\documentclass[12pt,a4paper]{article}
+
+% ─── Pacotes ───────────────────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{lmodern}
+\usepackage{parskip}
+\usepackage{amssymb}
+\usepackage{mdframed}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
+
+% ─── Geometria ─────────────────────────────────────────────────────────────────
+\geometry{
+  top=2.5cm, bottom=2.5cm,
+  left=2.8cm, right=2.8cm
+}
+\setlength{\headheight}{24.02pt}
+\addtolength{\topmargin}{-12.02pt}
+
+% ─── Cores ─────────────────────────────────────────────────────────────────────
+\definecolor{azulprimario}{RGB}{26, 82, 152}
+\definecolor{azulclaro}{RGB}{214, 229, 255}
+\definecolor{cinzaclaro}{RGB}{245, 246, 248}
+\definecolor{verdeok}{RGB}{39, 174, 96}
+\definecolor{amareloaviso}{RGB}{243, 156, 18}
+\definecolor{vermelhorrisco}{RGB}{192, 57, 43}
+\definecolor{cinzatexto}{RGB}{60, 60, 60}
+
+% ─── Hyperlinks ────────────────────────────────────────────────────────────────
+\hypersetup{
+  colorlinks=true,
+  linkcolor=azulprimario,
+  urlcolor=azulprimario,
+  citecolor=azulprimario,
+  pdftitle={Proposta Técnica — Sistema de Controle de Horas},
+  pdfauthor={Manuel Moraes},
+}
+
+% ─── Títulos ───────────────────────────────────────────────────────────────────
+\titleformat{\section}
+  {\Large\bfseries\color{azulprimario}}
+  {\thesection.}{0.6em}{}
+  [\color{azulprimario}\titlerule]
+
+\titleformat{\subsection}
+  {\large\bfseries\color{cinzatexto}}
+  {\thesubsection}{0.6em}{}
+
+\titlespacing{\section}{0pt}{1.8em}{0.8em}
+\titlespacing{\subsection}{0pt}{1.2em}{0.5em}
+
+% ─── Cabeçalho e Rodapé ────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{azulprimario}\textbf{Sistema de Controle de Horas}}
+\fancyhead[R]{\small\color{cinzatexto}Departamento de P\&D  — Confidencial}
+\fancyfoot[C]{\small\color{cinzatexto}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{azulprimario}\leaders\hrule height \headrulewidth\hfill}}
+
+% ─── Ambientes auxiliares ──────────────────────────────────────────────────────
+\newmdenv[
+  backgroundcolor=azulclaro,
+  linecolor=azulprimario,
+  linewidth=1.2pt,
+  leftmargin=0pt, rightmargin=0pt,
+  innerleftmargin=12pt, innerrightmargin=12pt,
+  innertopmargin=10pt, innerbottommargin=10pt,
+  roundcorner=4pt,
+  fontcolor=black
+]{caixaazul}
+\newmdenv[
+  backgroundcolor=cinzaclaro,
+  linecolor=cinzatexto!40,
+  linewidth=0.8pt,
+  leftmargin=0pt, rightmargin=0pt,
+  innerleftmargin=12pt, innerrightmargin=12pt,
+  innertopmargin=10pt, innerbottommargin=10pt,
+  roundcorner=4pt,
+  fontcolor=black
+]{caixacinzanov}
+
+% caixacinza já redefinida acima como caixacinzanov; mantida para compatibilidade
+\newmdenv[
+  backgroundcolor=cinzaclaro,
+  linecolor=cinzatexto!40,
+  linewidth=0.8pt,
+  leftmargin=0pt, rightmargin=0pt,
+  innerleftmargin=12pt, innerrightmargin=12pt,
+  innertopmargin=10pt, innerbottommargin=10pt,
+  roundcorner=4pt
+]{caixacinza}
+
+% ─── Comandos auxiliares ───────────────────────────────────────────────────────
+\newcommand{\badge}[2]{%
+  \colorbox{#1}{\color{white}\small\textbf{\,#2\,}}%
+}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\begin{document}
+
+% ─── Capa ──────────────────────────────────────────────────────────────────────
+\begin{titlepage}
+  \pagecolor{azulprimario}
+  \color{white}
+  \centering
+  \vspace*{3cm}
+
+  {\fontsize{11}{13}\selectfont\uppercase{Proposta Técnica de Desenvolvimento}}\\[0.6em]
+  {\fontsize{28}{32}\bfseries\selectfont Sistema de Controle\\[0.2em]de Horas e Atividades}\\[1.2em]
+  \color{azulclaro}
+  {\large Departamento de TI\enspace|\enspace Envision — setor de Pesquisa e Desenvolvimento}\\[0.4em]
+  {\normalsize Versão 1.1\enspace|\enspace Abril de 2026}
+
+  \vfill
+
+  \begin{tikzpicture}
+    \draw[white, line width=1pt] (0,0) -- (12,0);
+  \end{tikzpicture}
+
+  \vspace{1cm}
+  \color{white!80!azulprimario}
+  {\small Elaborado por \textbf{Manuel Moraes}\enspace|\enspace Documento confidencial — circulação restrita}
+\end{titlepage}
+\pagecolor{white}
+\color{black}
+
+% ─── Sumário ───────────────────────────────────────────────────────────────────
+\tableofcontents
+\newpage
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Sumário Executivo}
+
+Este documento apresenta a proposta técnica para o desenvolvimento de um sistema web
+destinado à automação do preenchimento de planilhas de horas e ao rastreamento de atividades
+do departamento de P\&D.
+
+O projeto visa eliminar o processo manual baseado em Excel, reduzindo erros, aumentando a
+produtividade da equipe e oferecendo ao gestor visibilidade em tempo real sobre a alocação de
+pessoas por projeto.
+
+\vspace{0.8em}
+\begin{tabularx}{\linewidth}{>{\bfseries}lX}
+  \toprule
+  Item & Descrição \\
+  \midrule
+  Empresa      & Envision — setor de Pesquisa e Desenvolvimento  \\
+  Usuários     & 11 a 50 colaboradores \\
+  Prazo        & 10 semanas (\textasciitilde{}2,5 meses) \\
+  Metodologia  & Ágil — Scrum com sprints de 2 semanas \\
+  Integração   & Nenhuma integração externa prevista \\
+  \bottomrule
+\end{tabularx}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Problema e Justificativa}
+
+\subsection{Situação Atual}
+
+O controle de horas trabalhadas no departamento de P\&D (internamente denominado \textbf{RD2})
+é realizado de forma manual com dois artefatos: um \textbf{Formulário Google Forms} para coleta
+de atividades dos membros (de estagiário a gerente) e planilhas Excel para consolidação e
+geração de relatórios de custo. Esse processo apresenta as seguintes fragilidades:
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \textbf{Retrabalho:} cada colaborador preenche o formulário individualmente, sem
+    padronização de formato ou validação de dados.
+  \item \textbf{Erros de preenchimento:} ausência de validação automática (horas inválidas,
+    projetos inexistentes, datas incorretas).
+  \item \textbf{Baixa visibilidade gerencial:} o gestor consolida múltiplas planilhas
+    manualmente para obter uma visão consolidada.
+  \item \textbf{Planilha de custos manual:} relatórios de custo por projeto são gerados
+    a posteriori, com risco de inconsistências.
+  \item \textbf{Validação demorada:} o balanço entre os dados do RD2 e os dados do
+    Financeiro é feito manualmente — se houver divergência, o processo retorna para revisão.
+  \item \textbf{Ausência de rastreabilidade:} não há histórico de alterações ou auditoria
+    dos registros.
+\end{itemize}
+
+\subsection{Impacto Esperado com a Solução}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item Redução significativa do tempo gasto no preenchimento e consolidação de horas.
+  \item Eliminação de erros por meio de validações automáticas.
+  \item Geração automática da planilha de custos por projeto.
+  \item Dashboard em tempo real com alocação de horas por pessoa e projeto.
+  \item Histórico completo e auditável de todas as atividades registradas.
+\end{itemize}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Solução Proposta}
+
+\subsection{Módulos do Sistema}
+
+\begin{tabularx}{\linewidth}{>{\bfseries}lX>{\itshape}l}
+  \toprule
+  Módulo & Funcionalidades Principais & Perfis \\
+  \midrule
+  Autenticação (Keycloak) & Login SSO, gerenciamento de perfis e permissões & Todos \\[4pt]
+  Lançamento de Horas     & Registro de: projeto, quantidade de horas e justificativa & Colaboradores \\[4pt]
+  Gestão de Projetos      & Cadastro de projetos (apenas Gestor), alocação de equipe & Gestores \\[4pt]
+  Relatórios / Custos     & Geração automática de planilha de custos, filtros por período & Gestores \\[4pt]
+  Dashboard               & Visão consolidada: horas por projeto e colaborador; tabela dinâmica com valor real vs.\ previsto; filtros de período & Gestores \\
+  \bottomrule
+\end{tabularx}
+
+\vspace{0.6em}
+\begin{caixaazul}
+  \textbf{Decisão de escopo:} apenas o \textbf{Gestor} tem permissão para cadastrar e editar
+  projetos. Os campos de lançamento são \textbf{fixos} (projeto, horas, justificativa) e
+  \textbf{não há fluxo de aprovação} — o lançamento é definitivo após a validação automática.
+\end{caixaazul}
+
+\subsection{Fluxo Principal}
+
+O sistema substitui o processo atual baseado em Google Forms e Excel pelo fluxo abaixo:
+
+\begin{enumerate}[leftmargin=1.8em]
+  \item \textbf{Login via Keycloak} — autenticação com controle de perfis e permissões.
+  \item \textbf{Seleção de Projeto} — colaborador visualiza os projetos em que está alocado.
+  \item \textbf{Preenchimento de Horas} — registro de: projeto, horas e justificativa
+    \textit{(3 campos fixos por projeto)}.
+  \item \textbf{Validação Automática} — sistema valida os dados antes de confirmar o lançamento.
+  \item \textbf{Geração de Relatório} — planilha de custos gerada automaticamente com base
+    nos lançamentos consolidados, substituindo a planilha Excel manual do processo atual.
+\end{enumerate}
+
+\textit{Regra especial:} colaboradores alocados em múltiplos projetos visualizarão os 3 campos
+separadamente para cada projeto, replicando o comportamento já esperado no formulário atual.
+
+\subsection{Tecnologias Recomendadas}
+
+\begin{tabularx}{\linewidth}{>{\bfseries}lXl}
+  \toprule
+  Camada & Tecnologia & Justificativa \\
+  \midrule
+  Frontend       & React.js + TypeScript       & Interface reativa, tipagem segura \\
+  Backend        & Node.js + NestJS            & API REST robusta e escalável \\
+  Banco de Dados & PostgreSQL                  & Relacional, gratuito e confiável \\
+  Autenticação   & Keycloak                    & SSO, conforme especificado \\
+  Exportação     & ExcelJS                     & Geração de planilhas \texttt{.xlsx} \\
+  Testes         & Jest + Playwright           & Unit, integração e E2E \\
+  CI/CD          & GitHub Actions              & Pipeline de lint, testes e deploy \\
+  Logging        & Winston / Pino              & Logs estruturados + health checks \\
+  Hospedagem     & Docker + VPS ou Cloud       & Escalável, deploy ágil \\
+  \bottomrule
+\end{tabularx}
+
+\vspace{0.8em}
+\textbf{Ambientes:}
+\begin{itemize}[leftmargin=1.5em]
+  \item \texttt{dev} — local, para desenvolvimento individual.
+  \item \texttt{staging} — servidor de homologação; validação pelo cliente antes do deploy.
+  \item \texttt{prod} — produção; Docker Compose em VPS como MVP, com opção de migrar para
+    AWS/GCP no futuro.
+\end{itemize}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Justificativa de Decisões Tecnológicas}
+
+\subsection{Critérios de Seleção}
+
+As tecnologias foram escolhidas com base em cinco critérios principais:
+
+\begin{enumerate}[leftmargin=1.8em]
+  \item \textbf{Custo Total de Propriedade (TCO):} preferência por ferramentas de código aberto
+    ou com licenças gratuitas para uso corporativo.
+  \item \textbf{Velocidade de Desenvolvimento:} frameworks e bibliotecas amplamente conhecidas
+    no mercado, para reduzir curva de aprendizado.
+  \item \textbf{Escalabilidade:} arquitetura preparada para crescimento (até 50 usuários
+    simultâneos nesta fase).
+  \item \textbf{Manutenibilidade:} código limpo, bem documentado e aderente a boas práticas
+    da indústria.
+  \item \textbf{Suporte Comunitário:} comunidades ativas, documentação robusta e recursos
+    abundantes online.
+\end{enumerate}
+
+\subsection{Análise de Alternativas Consideradas}
+
+\begin{tabularx}{\linewidth}{>{\bfseries}l l l l >{\raggedright\arraybackslash}X}
+  \toprule
+  \textbf{Camada} & \textbf{Escolhido} & \textbf{Alt.~1} & \textbf{Alt.~2} & \textbf{Razão da Escolha} \\
+  \midrule
+  Frontend   & React.js   & Vue.js  & Angular & Maior demanda de mercado; ecossistema maduro; menos burocracia que Angular \\[4pt]
+  Backend    & NestJS     & Express & FastAPI & Arquitetura opinionada; TypeScript nativo; testes integrados desde o início \\[4pt]
+  Banco      & PostgreSQL & MySQL   & MongoDB & Relacional~+ JSONB; melhor para auditoria; sem lock-in de schema \\[4pt]
+  Autent.    & Keycloak   & Auth0   & Okta    & Open-source; roda on-premises; elimina custo de SaaS por usuário \\[4pt]
+  Exportação & ExcelJS    & SheetJS & Aspose  & Documentação excelente; estilos avançados; licença MIT \\
+  \bottomrule
+\end{tabularx}
+
+\subsection{Decisões Principais}
+
+\begin{caixaazul}
+\textbf{1. React + TypeScript (Frontend)}
+
+\textit{Justificativa:} React é o framework mais requisitado no mercado brasileiro e internacional.
+TypeScript reduz bugs em tempo de compilação. O ecossistema (Redux, Axios, React Router) é
+maduro e bem documentado. Alternativas como Vue.js e Angular foram descartadas porque Vue
+tem comunidade menor (poder ficar órfão) e Angular é excessivamente burocrático para um
+projeto de 10 semanas.
+\end{caixaazul}
+
+\begin{caixaazul}
+\textbf{2. NestJS + Node.js (Backend)}
+
+\textit{Justificativa:} NestJS força uma arquitetura limpa (módulos, controllers, services)
+sem permitir código ``anárquico'' como Express puro. Suporta TypeScript nativamente. A
+estrutura de testes é integrada desde o início. Para Python/FastAPI, teríamos mudança de
+stack entre frontend e backend, complicando DevOps (\textit{single language deployment}).
+\end{caixaazul}
+
+\begin{caixaazul}
+\textbf{3. PostgreSQL (Banco de Dados)}
+
+\textit{Justificativa:} Relacional é correto para este domínio (usuários, projetos, hora\-rios,
+auditoria). PostgreSQL oferece JSONB para flexibilidade futura, full-text search e suporta
+constraints complexas (garantir que horas $\geq 0$, etc.). MongoDB seria overkill. MySQL fica
+para trás em features avançadas.
+\end{caixaazul}
+
+\begin{caixaazul}
+\textbf{4. Keycloak (Autenticação SSO)}
+
+\textit{Justificativa:} Empresa já mencionou Keycloak na proposta original como requisito.
+Keycloak é open-source, roda em Docker, suporta OIDC/OAuth 2.0 padrão. Auth0 e Okta são
+SaaS cobrados por usuário/mês e oneram o orçamento conforme o time cresce. Keycloak pode
+rodar localmente sem custo adicional.
+\end{caixaazul}
+
+\subsection{Diagrama de Arquitetura}
+
+O sistema é organizado em quatro camadas horizontais independentes:
+
+\vspace{1.2em}
+\begin{center}
+\begin{tikzpicture}[
+  client/.style={
+    rectangle, rounded corners=3pt,
+    draw=azulprimario, fill=azulclaro!30,
+    minimum width=2.5cm, minimum height=0.95cm,
+    align=center, font=\small\bfseries, inner sep=5pt
+  },
+  febox/.style={
+    rectangle, rounded corners=3pt,
+    draw=azulprimario, fill=azulprimario!10,
+    minimum width=10.4cm, minimum height=0.95cm,
+    align=center, font=\small\bfseries, inner sep=5pt
+  },
+  authbox/.style={
+    rectangle, rounded corners=3pt,
+    draw=amareloaviso!80, fill=amareloaviso!20,
+    minimum width=3.0cm, minimum height=0.95cm,
+    align=center, font=\small\bfseries, inner sep=5pt
+  },
+  svcbox/.style={
+    rectangle, rounded corners=3pt,
+    draw=azulprimario, fill=azulclaro!55,
+    minimum width=3.0cm, minimum height=0.95cm,
+    align=center, font=\small\bfseries, inner sep=5pt
+  },
+  databox/.style={
+    rectangle, rounded corners=3pt,
+    draw=verdeok!70, fill=verdeok!15,
+    minimum width=2.6cm, minimum height=0.95cm,
+    align=center, font=\small\bfseries, inner sep=5pt
+  },
+  arr/.style={-{Stealth[scale=1.1]}, draw=azulprimario!60, line width=1pt},
+  lbl/.style={font=\tiny, fill=white, inner sep=1.5pt, text=cinzatexto},
+  layerlbl/.style={font=\scriptsize\itshape, text=cinzatexto!65, anchor=east}
+]
+
+%% Camada 1 — Clientes
+\node[client] (c1) at (1.5, 4.2)  {Colaborador\\\footnotesize browser};
+\node[client] (c2) at (5.2, 4.2)  {Gestor\\\footnotesize browser};
+\node[client] (c3) at (8.9, 4.2)  {Admin\\\footnotesize browser};
+\node[layerlbl] at (0.15, 4.2) {Clientes};
+
+%% Camada 2 — Frontend
+\node[febox] (fe) at (5.2, 2.9)   {React.js + TypeScript\enspace\textbar\enspace Frontend};
+\node[layerlbl] at (0.15, 2.9) {Frontend};
+
+%% Camada 3 — Backend
+\node[authbox] (kc)  at (1.5, 1.5) {Keycloak\\\footnotesize SSO / OIDC};
+\node[svcbox]  (api) at (6.8, 1.5) {NestJS\\\footnotesize API REST};
+\node[layerlbl] at (0.15, 1.5) {Backend};
+
+%% Camada 4 — Dados
+\node[databox] (db)  at (2.8, 0.0) {PostgreSQL\\\footnotesize banco};
+\node[databox] (xl)  at (5.8, 0.0) {ExcelJS\\\footnotesize exportação};
+\node[databox] (log) at (8.8, 0.0) {Winston\\\footnotesize logs};
+\node[layerlbl] at (0.15, 0.0) {Dados};
+
+%% Setas: Clientes → Frontend
+\draw[arr] (c1.south) -- (c1.south |- fe.north);
+\draw[arr] (c2.south) -- (fe.north);
+\draw[arr] (c3.south) -- (c3.south |- fe.north);
+
+%% Setas: Frontend → Backend
+\draw[arr] (fe.south -| kc.north) -- (kc.north)
+  node[lbl, pos=0.5, right=2pt] {login};
+\draw[arr] (fe.south -| api.north) -- (api.north)
+  node[lbl, pos=0.5, right=2pt] {REST};
+
+%% Setas: API → Dados
+\draw[arr] (api.south) -- ++(0,-0.3) -| (db.north);
+\node[lbl] at (4.8, 1.17) {CRUD};
+\draw[arr] (api.south) -- (xl.north)
+  node[lbl, pos=0.5, right=2pt] {export};
+\draw[arr] (api.south) -- ++(0,-0.3) -| (log.north);
+\node[lbl] at (7.9, 1.17) {logs};
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.4em}
+{\small\itshape\color{cinzatexto} Cada camada é independente e se comunica apenas com a camada adjacente. A autenticação é gerida pelo Keycloak antes de qualquer requisição chegar à API.}
+
+\subsection{Fluxo de Dados no Sistema}
+
+O diagrama abaixo representa o fluxo de um lançamento de horas do início ao fim.
+As ramificações à direita mostram o que ocorre em caso de erro em cada etapa de validação:
+
+\vspace{1.2em}
+\begin{center}
+\begin{tikzpicture}[
+  stepbox/.style={
+    rectangle, rounded corners=4pt,
+    draw=azulprimario, fill=azulclaro!35,
+    minimum width=8.2cm, minimum height=0.88cm,
+    align=center, font=\small\bfseries, inner sep=5pt
+  },
+  endbox/.style={
+    rectangle, rounded corners=4pt,
+    draw=verdeok!80, fill=verdeok!18,
+    minimum width=8.2cm, minimum height=0.88cm,
+    align=center, font=\small\bfseries, inner sep=5pt
+  },
+  errbox/.style={
+    rectangle, rounded corners=3pt,
+    draw=vermelhorrisco!70, fill=vermelhorrisco!10,
+    minimum width=2.8cm, minimum height=0.88cm,
+    align=center, font=\small, inner sep=4pt
+  },
+  arr/.style={-{Stealth[scale=1.1]}, draw=azulprimario!65, line width=1pt},
+  errarr/.style={-{Stealth[scale=1.0]}, draw=vermelhorrisco!70, line width=0.8pt, dashed}
+]
+
+\node[stepbox] (s1) at (0, 0.0)
+  {\textbf{1.}\ Colaborador preenche formulário\\\scriptsize projeto + horas + justificativa};
+\node[stepbox] (s2) at (0, -1.4)
+  {\textbf{2.}\ Validação no Frontend\\\scriptsize campos obrigatórios, formato e limites de horas};
+\node[stepbox] (s3) at (0, -2.8)
+  {\textbf{3.}\ Requisição POST para NestJS API\\\scriptsize token Keycloak no cabeçalho};
+\node[stepbox] (s4) at (0, -4.2)
+  {\textbf{4.}\ Validação no Backend (NestJS)\\\scriptsize regras de negócio + autorização};
+\node[stepbox] (s5) at (0, -5.6)
+  {\textbf{5.}\ Persistência no PostgreSQL\\\scriptsize insere registro em \texttt{TimeEntry}};
+\node[stepbox] (s6) at (0, -7.0)
+  {\textbf{6.}\ Registro em AuditLog\\\scriptsize rastreabilidade imutável da operação};
+\node[endbox]  (s7) at (0, -8.4)
+  {\textcolor{verdeok}{\checkmark}\ Confirmação exibida ao usuário};
+
+%% Setas do fluxo principal
+\foreach \a/\b in {s1/s2, s2/s3, s3/s4, s4/s5, s5/s6, s6/s7}
+  \draw[arr] (\a.south) -- (\b.north);
+
+%% Ramificações de erro
+\node[errbox] (e2) at (7.2, -1.4)
+  {Erro exibido\\\small ao usuário};
+\node[errbox] (e4) at (7.2, -4.2)
+  {HTTP 400\\\small retornado};
+
+\draw[errarr] (s2.east) -- (e2.west)
+  node[midway, above, font=\tiny, text=vermelhorrisco!80] {falha};
+\draw[errarr] (s4.east) -- (e4.west)
+  node[midway, above, font=\tiny, text=vermelhorrisco!80] {falha};
+
+\end{tikzpicture}
+\end{center}
+
+\textit{Nota:} as validações ocorrem em duas camadas (Frontend e Backend) para garantir
+tanto a boa experiência ao usuário quanto a segurança no servidor. O AuditLog é gravado
+após o commit no banco, garantindo rastreabilidade imutável.
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Modelo de Dados}
+
+As cinco entidades principais do sistema são descritas a seguir.
+
+\begin{tabularx}{\linewidth}{>{\bfseries\ttfamily}lX}
+  \toprule
+  Entidade & Responsabilidade \\
+  \midrule
+  User          & Dados do colaborador; perfil de acesso (admin, gestor, colaborador) \\
+  Project       & Projetos cadastrados pelo gestor; status e responsável \\
+  ProjectMember & Vínculo entre User e Project; define quais colaboradores estão alocados \\
+  TimeEntry     & Registro de lançamento: usuário, projeto, data, horas, justificativa \\
+  AuditLog      & Histórico imutável de todas as operações de escrita no sistema \\
+  \bottomrule
+\end{tabularx}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Escopo do Projeto}
+
+\subsection{Dentro do Escopo}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item Tela de login integrada ao Keycloak com gerenciamento de perfis.
+  \item Cadastro e gerenciamento de projetos (exclusivo para Gestores).
+  \item Formulário de lançamento com 3 campos fixos: projeto, horas e justificativa.
+  \item Regra de múltiplos projetos: colaboradores em mais de 1 projeto preenchem os campos
+    separadamente para cada um.
+  \item Dashboard gerencial: horas por projeto e colaborador, com filtros de período.
+  \item Geração automática de planilha de custos (Excel) por projeto e período.
+  \item Histórico e auditoria de lançamentos.
+  \item Controle de permissões por perfil.
+  \item Pipeline de CI/CD com ambientes dev, staging e produção.
+\end{itemize}
+
+\subsection{Fora do Escopo}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item Integração com ferramentas externas (Jira, Azure DevOps, ERP, folha de pagamento etc.).
+  \item Aplicativo mobile nativo (iOS/Android) — o sistema será responsivo para uso via browser.
+  \item Módulo financeiro avançado (impostos, nota fiscal etc.).
+  \item Funcionalidades de inteligência artificial ou análise preditiva.
+  \item Etapas manuais de revisão ou reabertura de lançamentos após a validação automática.
+  \item \textbf{Validação automática RD2 × Financeiro} — a conciliação entre os lançamentos
+    do sistema e os dados da área Financeira é um processo externo e não faz parte do escopo
+    desta versão. Poderá ser considerada como evolução futura em uma versão 2.0.
+\end{itemize}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Requisitos Não-Funcionais}
+
+\begin{tabularx}{\linewidth}{>{\bfseries}l >{\raggedright\arraybackslash}X l}
+  \toprule
+  Requisito & Critério & Meta \\
+  \midrule
+  Performance      & Tempo de resposta para lançamento de horas  & $<$ 2 s \\
+  Disponibilidade  & Uptime em horário comercial                 & $\geq$ 99,5\% \\
+  Concorrência     & Usuários simultâneos sem degradação         & até 50 \\
+  Volume           & Lançamentos por mês estimados               & até 5.000 \\
+  Compatibilidade  & Navegadores suportados                      & Chrome, Firefox, Edge (últimas 2 versões) \\
+  Responsividade   & Uso via browser em dispositivos móveis      & Obrigatório \\
+  \bottomrule
+\end{tabularx}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Conformidade e Segurança}
+
+\subsection{LGPD}
+
+Os dados de colaboradores (nome, e-mail, horas trabalhadas) constituem dados pessoais sob a
+Lei Geral de Proteção de Dados (Lei n.º 13.709/2018). O sistema deverá contemplar:
+
+\begin{itemize}[leftmargin=1.5em]
+  \item Definição clara de \textbf{controlador} e \textbf{operador} dos dados.
+  \item Política de \textbf{retenção}: prazo máximo de armazenamento de registros históricos
+    (sugestão: 5 anos, alinhado à política da empresa).
+  \item Funcionalidade de \textbf{anonimização ou exclusão} de dados de ex-colaboradores,
+    mediante solicitação formal.
+  \item Registro de consentimento no aceite de uso do sistema.
+\end{itemize}
+
+\subsection{Controle de Acesso}
+
+\begin{tabularx}{\linewidth}{>{\bfseries}lX}
+  \toprule
+  Perfil & Permissões \\
+  \midrule
+  Admin       & Gerenciamento de usuários, perfis e configurações gerais do sistema \\
+  Gestor      & Cadastro de projetos, alocação de equipe, acesso ao dashboard e relatórios \\
+  Colaborador & Lançamento de horas nos projetos em que está alocado; visualização do próprio histórico \\
+  \bottomrule
+\end{tabularx}
+
+\subsection{Backup e Recuperação}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \textbf{RPO} (Recovery Point Objective): máximo de 24 horas de perda de dados.
+  \item \textbf{RTO} (Recovery Time Objective): restauração do serviço em até 4 horas.
+  \item Backup diário automático do banco PostgreSQL com retenção de 30 dias.
+  \item Testes de restauração a cada sprint de produção.
+\end{itemize}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Cronograma de Entrega}
+
+O projeto é dividido em \textbf{5 sprints de 2 semanas} (total: 10 semanas), com entrega
+validável ao final de cada ciclo.
+
+\vspace{0.5em}
+\begin{center}
+\begin{tikzpicture}
+  % ---- Month header bands (Mes 1: S1-S4, Mes 2: S5-S8, Mes 3: S9-S10) ----
+  % Grid left edge x=2.5, week width=1.27, total grid width=12.7
+  % Month 1 end: 2.5 + 4*1.27 = 7.58
+  % Month 2 end: 2.5 + 8*1.27 = 12.66
+  % Month 3 end: 2.5 + 10*1.27 = 15.20
+  \fill[azulprimario]      (2.5,  0.45) rectangle (7.58,  0.90);
+  \fill[azulprimario!60]   (7.58, 0.45) rectangle (12.66, 0.90);
+  \fill[azulprimario!30]   (12.66,0.45) rectangle (15.20, 0.90);
+  \node[white,       font=\footnotesize\bfseries] at (5.04,  0.675) {M\^es~1};
+  \node[white,       font=\footnotesize\bfseries] at (10.12, 0.675) {M\^es~2};
+  \node[azulprimario,font=\footnotesize\bfseries] at (13.93, 0.675) {M\^es~3};
+
+  % ---- Week sub-headers ----
+  \foreach \w in {1,...,10} {
+    \node[font=\scriptsize, text=cinzatexto]
+      at ({2.5+(\w-0.5)*1.27}, 0.22) {S\,\w};
+  }
+
+  % ---- Alternating row backgrounds (rows 0, 2, 4) ----
+  % Row i: y from -(i*1.1) to -(i*1.1+0.90)
+  \fill[gray!8] (0,  0.00) rectangle (15.20, -0.90);
+  \fill[gray!8] (0, -2.20) rectangle (15.20, -3.10);
+  \fill[gray!8] (0, -4.40) rectangle (15.20, -5.30);
+
+  % ---- Vertical week separators ----
+  \foreach \i in {0,1,...,10} {
+    \draw[gray!20, very thin] ({2.5+\i*1.27}, 0.45) -- ({2.5+\i*1.27}, -5.35);
+  }
+  % Stronger month dividers
+  \draw[azulprimario!40, thin] (7.58,  0.45) -- (7.58,  -5.35);
+  \draw[azulprimario!40, thin] (12.66, 0.45) -- (12.66, -5.35);
+
+  % ---- Sprint labels: name (bold, blue) + phase (small, grey) ----
+  % Row centers: -0.45, -1.55, -2.65, -3.75, -4.85
+  \node[font=\small\bfseries, text=azulprimario, anchor=west] at (0.05, -0.27) {Sprint~0};
+  \node[font=\scriptsize, text=cinzatexto,       anchor=west] at (0.05, -0.65) {Infra \& Setup};
+
+  \node[font=\small\bfseries, text=azulprimario, anchor=west] at (0.05, -1.37) {Sprint~1};
+  \node[font=\scriptsize, text=cinzatexto,       anchor=west] at (0.05, -1.75) {Autentica\c{c}\~ao};
+
+  \node[font=\small\bfseries, text=azulprimario, anchor=west] at (0.05, -2.47) {Sprint~2};
+  \node[font=\scriptsize, text=cinzatexto,       anchor=west] at (0.05, -2.85) {Lan\c{c}. Horas};
+
+  \node[font=\small\bfseries, text=azulprimario, anchor=west] at (0.05, -3.57) {Sprint~3};
+  \node[font=\scriptsize, text=cinzatexto,       anchor=west] at (0.05, -3.95) {Dashboard};
+
+  \node[font=\small\bfseries, text=azulprimario, anchor=west] at (0.05, -4.67) {Sprint~4};
+  \node[font=\scriptsize, text=cinzatexto,       anchor=west] at (0.05, -5.05) {Homologa\c{c}\~ao};
+
+  % ---- Gantt bars (each 2 weeks wide, 0.06 inset) ----
+  % Sprint 0: x 2.56 -> 5.00, y -0.06 -> -0.84  (center: 3.78, -0.45)
+  \fill[azulprimario, rounded corners=2pt] (2.56, -0.06) rectangle (5.00, -0.84);
+  \node[font=\scriptsize\bfseries, white] at (3.78, -0.45) {Setup};
+
+  % Sprint 1: x 5.10 -> 7.54  (center: 6.32, -1.55)
+  \fill[azulprimario, rounded corners=2pt] (5.10, -1.16) rectangle (7.54, -1.94);
+  \node[font=\scriptsize\bfseries, white] at (6.32, -1.55) {Login};
+
+  % Sprint 2: x 7.64 -> 10.08  (center: 8.86, -2.65)
+  \fill[azulprimario, rounded corners=2pt] (7.64, -2.26) rectangle (10.08, -3.04);
+  \node[font=\scriptsize\bfseries, white] at (8.86, -2.65) {Horas};
+
+  % Sprint 3: x 10.18 -> 12.62  (center: 11.40, -3.75)
+  \fill[azulprimario, rounded corners=2pt] (10.18, -3.36) rectangle (12.62, -4.14);
+  \node[font=\scriptsize\bfseries, white] at (11.40, -3.75) {Dashboard};
+
+  % Sprint 4: x 12.72 -> 15.16  (center: 13.94, -4.85)
+  \fill[azulprimario, rounded corners=2pt] (12.72, -4.46) rectangle (15.16, -5.24);
+  \node[font=\scriptsize\bfseries, white] at (13.94, -4.85) {Deploy};
+
+  % ---- Milestone diamonds at right edge of each bar ----
+  \node[diamond, fill=verdeok,      draw=white, line width=0.5pt,
+        minimum size=8pt, inner sep=0pt] at (5.00,  -0.45) {};
+  \node[diamond, fill=verdeok,      draw=white, line width=0.5pt,
+        minimum size=8pt, inner sep=0pt] at (7.54,  -1.55) {};
+  \node[diamond, fill=verdeok,      draw=white, line width=0.5pt,
+        minimum size=8pt, inner sep=0pt] at (10.08, -2.65) {};
+  \node[diamond, fill=verdeok,      draw=white, line width=0.5pt,
+        minimum size=8pt, inner sep=0pt] at (12.62, -3.75) {};
+  \node[diamond, fill=amareloaviso, draw=white, line width=0.5pt,
+        minimum size=10pt, inner sep=0pt] at (15.16, -4.85) {};
+
+  % ---- Outer border ----
+  \draw[azulprimario!30, thin] (2.5, 0.45) rectangle (15.20, -5.35);
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.15em}
+{\small\textcolor{cinzatexto}{%
+  \textcolor{verdeok}{$\diamond$}\enspace Entrega validada\quad
+  \textcolor{amareloaviso}{$\diamond$}\enspace Deploy em produ\c{c}\~ao\quad
+  S\,= Semana}}
+\vspace{0.7em}
+
+\begin{tabularx}{\linewidth}{>{\bfseries}l l >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X}
+  \toprule
+  \textbf{Sprint} & \textbf{Per\'iodo} & \textbf{Entregas Principais} & \textbf{Crit\'erio de Aceite} & \textbf{Definition of Done} \\
+  \midrule
+  Sprint~0 & Sem.~1--2 &
+    Setup do ambiente, CI/CD, reposit\'orio, Docker, arquitetura, modelagem do banco e
+    Keycloak configurado &
+    Pipeline verde; Keycloak com perfis criados; schema do banco migrado e revisado &
+    Ambientes de desenvolvimento e staging preparados; automações básicas executando; arquitetura e decisões técnicas documentadas \\[6pt]
+  Sprint~1 & Sem.~3--4 &
+    Login SSO, gest\~ao de perfis, CRUD de projetos e aloca\c{c}\~ao de colaboradores &
+    Login funcional em staging; CRUD de projetos aprovado em revis\~ao com o cliente &
+    Controle de acesso por perfil aplicado; cadastro de projetos restrito a gestor; auditoria básica de autenticação e escrita funcionando \\[6pt]
+  Sprint~2 & Sem.~5--6 &
+    Lan\c{c}amento de horas, valida\c{c}\~oes e regra de m\'ultiplos projetos &
+    Formul\'ario aprovado pelo usu\'ario piloto; cobertura de testes $\geq$ 80\% &
+    Fluxo com campos fixos entregue; validações automáticas cobrindo cenários principais; múltiplos projetos tratados em blocos separados \\[6pt]
+  Sprint~3 & Sem.~7--8 &
+    Dashboard gerencial, exporta\c{c}\~ao Excel, relat\'orios por filtro
+    (projeto, colaborador, per\'iodo) &
+    Dashboard exibindo KPIs reais; planilha validada pelo Financeiro\,/\,RD2 &
+    KPIs e filtros homologados; exportação aderente ao template confirmado; logs estruturados e health checks disponíveis \\[6pt]
+  Sprint~4 & Sem.~9--10 &
+    Testes de aceita\c{c}\~ao (UAT), corre\c{c}\~oes, documenta\c{c}\~ao e
+    deploy em produ\c{c}\~ao &
+    UAT aprovado; sistema em produ\c{c}\~ao; documenta\c{c}\~ao de opera\c{c}\~ao entregue &
+    Operação documentada; backup e restauração verificados; plano de rollback conhecido pela equipe \\
+  \bottomrule
+\end{tabularx}
+
+\textbf{Prazo total estimado: 10 semanas (\textasciitilde{}2,5 meses)}, dentro da janela de 1 a 3 meses
+solicitada.
+
+% ══════════════════════════════════════════════════════════════════════════════
+
+\section{Riscos e Mitigações}
+
+\begin{tabularx}{\linewidth}{Xllp{5cm}}
+  \toprule
+  Risco & Prob. & Impacto & Mitigação \\
+  \midrule
+  Escopo mal definido / mudanças frequentes &
+    \badge{amareloaviso}{Média} & Alto &
+    Reunião de alinhamento antes de cada sprint. Mudanças entram no backlog da próxima sprint. \\[6pt]
+  Baixa adoção pelos usuários &
+    \badge{amareloaviso}{Média} & Médio &
+    Treinamento de 1h + manual de uso. Interface simplificada e intuitiva. \\[6pt]
+  Complexidade de configuração do Keycloak &
+    \badge{verdeok}{Baixa} & Alto &
+    Sprint 0 dedicado à configuração e validação antes do desenvolvimento principal. \\[6pt]
+  Indisponibilidade da equipe &
+    \badge{verdeok}{Baixa} & Médio &
+    Cronograma com buffer absorvido no Sprint 4. \\[6pt]
+  Vazamento de dados de colaboradores (LGPD) &
+    \badge{verdeok}{Baixa} & Alto &
+    HTTPS obrigatório; autenticação via Keycloak; auditoria de acessos habilitada. \\
+  \bottomrule
+\end{tabularx}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Pontos em Aberto para Validação}
+
+Os pontos abaixo permanecem em aberto e devem ser respondidos antes do início das frentes
+que dependem diretamente dessas decisões.
+
+\begin{tabularx}{\linewidth}{clXX}
+  \toprule
+  \# & Status & Questão & Impacto \\
+  \midrule
+  2 & \badge{amareloaviso}{Aberto} &
+    A planilha de custos existente será o template de saída do sistema? &
+    Impacta diretamente o Sprint~3, a implementação com ExcelJS e a validação com RD2/Financeiro \\[6pt]
+  5 & \badge{amareloaviso}{Aberto} &
+    O sistema atenderá apenas este departamento ou múltiplas equipes/empresas? &
+    Impacta arquitetura de banco, autenticação, segregação de dados e decisões do Sprint~0 \\
+  \bottomrule
+\end{tabularx}
+
+\vspace{0.6em}
+\begin{caixacinza}
+  \textbf{Decisões incorporadas ao escopo (pontos 1, 3 e 4 já respondidos):}\\[6pt]
+  \textbf{1.} Apenas o Gestor pode cadastrar projetos.\\[2pt]
+  \textbf{3.} Os campos de lançamento são fixos: projeto, horas e justificativa.\\[2pt]
+  \textbf{4.} Não há fluxo de aprovação — o lançamento é definitivo após validação.
+\end{caixacinza}
+
+\vspace{0.6em}
+\begin{caixacinza}
+  \textbf{Decisões pendentes que precisam de validação formal:}\\[6pt]
+  \textbf{2.} Confirmar se a planilha de custos atual será reutilizada como template oficial de saída.\\[2pt]
+  \textbf{5.} Confirmar se o sistema seguirá arquitetura single-tenant ou se precisará suportar múltiplas equipes/empresas.
+\end{caixacinza}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Próximos Passos}
+
+\begin{enumerate}[leftmargin=1.8em]
+  \item Validar e aprovar esta proposta com os stakeholders.
+  \item Confirmar disponibilidade da equipe de desenvolvimento.
+  \item Validar com RD2/Financeiro se a planilha de custos atual será o template oficial do Sprint~3.
+  \item Confirmar com TI/Arquitetura se o produto será single-tenant ou preparado para múltiplas equipes/empresas.
+  \item Coletar o arquivo da planilha de custos atual, caso a decisão do item anterior seja positiva.
+  \item Definir ambiente de homologação e credenciais do Keycloak.
+  \item Agendar reunião de kickoff para o Sprint~0 (ambiente + arquitetura).
+\end{enumerate}
+
+\vspace{1em}
+\begin{caixaazul}
+  \centering
+  \textbf{Após a aprovação desta proposta e a resolução dos dois pontos em aberto,\\
+  o projeto poderá ter início imediato.}
+\end{caixaazul}
+
+\vspace{2em}
+\noindent\rule{\linewidth}{0.4pt}\\[0.4em]
+{\small Proposta elaborada com base no fluxo do Projeto XL\enspace|\enspace
+Abril de 2026\enspace|\enspace\textit{Confidencial — circulação restrita}}
+
+\end{document}
